@@ -77,3 +77,10 @@ Run after any change to layout, CSS or a page. Lighthouse and puppeteer are not 
 - Ad-free build (current): `npm run build:web && npm run check:compliance`.
 - Monetised build: set the variables from `apps/web/.env.example` (client id, one slot id per page, `PUBLIC_CONTACT_EMAIL`, `ADS_TXT`), build, then run the check with the **same** variables.
 - Env values used by components must be read in frontmatter. `import.meta.env.X` written inside a page's template expression was not replaced at build time and silently rendered no ad units; the gate's "no ad unit configured" rule caught it.
+
+## Mobile QA
+- `npm test` runs core, web-script and mobile tests; `npm run typecheck` covers all three.
+- `npm run bundle:mobile` builds the full Android Hermes bundle (proves Metro resolves the shared core and its JSON data). Last run: 3 MB bundle; the audit-flagged `decode-uri-component` and `query-string` are NOT in it (searched the bytecode), and the IFTA and IRS data are.
+- Native build: from `apps/mobile`, `npx expo prebuild --platform android --no-install --clean`, then `cd android && ./gradlew assembleDebug`. Read the target SDK from the APK with `aapt2 dump badging app-debug.apk | grep targetSdkVersion` (build-tools 36 is installed). `android/`, `ios/`, `.expo/` and `dist-android/` are generated and git-ignored.
+- **Network note (this dev machine):** IPv6 to the npm registry fails, which made installs crawl. Use `NODE_OPTIONS=--dns-result-order=ipv4first` for npm and `JAVA_TOOL_OPTIONS=-Djava.net.preferIPv4Stack=true` for Gradle.
+- Still needed before release: run on a real device or emulator (consent form, test ads, TalkBack), and screenshots for the store listing.

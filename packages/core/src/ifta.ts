@@ -97,7 +97,7 @@ export function validateIfta(input: IftaInput, table: IftaRateTable | undefined)
   const seen = new Set<string>();
   input.jurisdictions.forEach((j, i) => {
     const at = `jurisdictions[${i}]`;
-    if (table && !Object.hasOwn(table.rates, j?.code)) {
+    if (table && !Object.prototype.hasOwnProperty.call(table.rates, j?.code)) {
       errors.push({ field: `${at}.code`, message: "Choose a state." });
     } else if (seen.has(j?.code)) {
       errors.push({ field: `${at}.code`, message: "Each state can only be listed once." });

@@ -40,7 +40,7 @@ apps/web/src/
   styles/tool.css  shared, GLOBAL styles (see the rule below)
   pages/  index, calculators/, guides/, glossary/, about, privacy, terms, contact
   content/  guides/*.md (Astro content collections, typed frontmatter)
-apps/mobile/  (Phase 3)
+apps/mobile/  Expo app: app/ (routes), src/screens, src/ads, src/ui, src/lib
 docs/
 ```
 
@@ -66,12 +66,15 @@ docs/
 | CLS | ≤ 0.1, ad slots have reserved `min-height` |
 
 ## Mobile architecture (Phase 3)
-- Expo managed workflow with EAS Build; development builds for the AdMob native module.
-- Screens map 1:1 to calculators; each screen is thin: form state → core → result list.
-- Local persistence with `expo-sqlite` or MMKV for saved scenarios (no cloud, no accounts).
-- Ads: adaptive banner at screen bottom (outside scroll and input areas), interstitial only after a completed calculation and a frequency cap, rewarded ad only for an explicit opt-in action.
-- Consent via Google UMP before any ad request; ads request is gated on consent status.
-- Offline first: all logic is local; rates data bundled and updated through app releases (and optionally a signed JSON fetched from the site, Phase 5).
+Built with Expo SDK 57 (React Native 0.86, React 19.2, target and compile SDK 36), expo-router, `react-native-google-mobile-ads` 17.
+- **One copy of React and React Native.** The root `package.json` pins both with `overrides`; without it npm hoisted RN 0.87.1 next to the app's 0.86.3 (two copies break Metro at runtime). TypeScript is 5.9 everywhere.
+- **Layout:** `app/` holds thin route files that re-export `src/screens/*`. Screens are string form state → core `calculate…` → result rows, the same shape as the web pages. Shared UI is `src/ui/kit.tsx` and `CalculatorScreen`; `src/lib/format.ts` formats numbers without `Intl` so output is identical on every device and matches the website.
+- **Ads live only in `CalculatorScreen`** (banner below the scroll area and hidden while the keyboard is up; the leave-screen hook). The home, settings and consent screens carry none.
+- **Ad logic is plain TypeScript with tests, not buried in components:** `interstitialPolicy.ts` (when an interstitial may show; its only entry point is leaving a calculator screen, guarded by a structural test), `interstitialController.ts` (keeps one ad pre-loaded, no retry loop), `consentGate.ts` (nothing is configured, initialised or requested until consent allows it; every failure fails closed), `adUnits.ts` (dev = Google test ids, release = ids from build env or none).
+- **Config:** `app.config.ts` reads `ADMOB_ANDROID_APP_ID`, `ADMOB_ANDROID_BANNER_UNIT_ID`, `ADMOB_ANDROID_INTERSTITIAL_UNIT_ID` (defaults are Google's sample ids). It blocks unneeded permissions, turns off backup, and registers no deep-link scheme.
+- **Not built yet:** saved scenarios (local storage), tablet layout, a native time/date picker for detention (times are typed as HH:MM).
+- **Known duplication:** the detention stop-assembly logic exists in both the web page and `DetentionScreen`; move it into core when next touching either.
+- **Offline first:** all logic is local; rate data is bundled and updated through app releases.
 
 ## Data flow
 ```

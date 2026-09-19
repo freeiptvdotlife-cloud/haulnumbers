@@ -35,6 +35,20 @@ Sources: [AdSense ad placement policies](https://support.google.com/adsense/answ
 | `app-ads.txt` on the developer website named in the Play listing | `/app-ads.txt` is generated from the `APP_ADS_TXT` build variable (needs the domain) |
 | Native/rewarded formats have their own rules | Not used at launch; rewarded only as an explicit opt-in (Phase 5), native only with visible "Ad" attribution |
 
+### App rules: where each is enforced in code (tests in `apps/mobile/src`)
+| Rule | Enforced by |
+|---|---|
+| No interstitial on launch/exit/timer; only when leaving a calculator screen | `InterstitialPolicy` has exactly one trigger; a structural test fails if another method is added |
+| Not while filling out a form; only after a result was viewed | `fieldFocused` and `hasViewedResult` gates; `useLeaveInterstitial` tests |
+| Conservative frequency (first minute, 3 min apart, every 3rd qualifying leave) | `interstitialPolicy.test.ts` (each reason has a passing and a failing case) |
+| Ads SDK not initialised or requested before consent; fail closed | `consentGate.test.ts`; `AdsProvider` starts only through `startAds` |
+| Withdrawing consent switches ads off | `changePrivacyChoices` re-evaluates; test |
+| No ads on menu, settings or consent screens; banner hidden while typing | `screens.test.tsx` (banner absent on Home/Settings; `AdBanner` returns null with the keyboard up) |
+| Test ids in dev, never a test-id fallback in release | `adUnits.test.ts` |
+| Minimal permissions and no backup or deep links | `app.config.ts`; verified in the generated manifest (`tools:node="remove"` on four permissions) |
+
+Play data-safety inputs (complete in Phase 3.6): permissions requested by our config are `INTERNET` only; the AdMob SDK merges `ACCESS_NETWORK_STATE` and `com.google.android.gms.permission.AD_ID` (confirm in the built APK's manifest with `aapt2 dump permissions`).
+
 ### Not yet verified (do not treat as confirmed)
 - `https://business.safety.google/privacy/` (Google Business Data Responsibility page) is linked from the privacy policy because Google's EU consent policy asks for it, but the URL could not be fetched from this environment. Open it once and confirm before launch.
 - Exact UMP SDK behaviour and the current `react-native-google-mobile-ads` consent API: read their docs when Phase 3.4 starts.

@@ -7,10 +7,15 @@
     "apps/*"
   ],
   "scripts": {
-    "test": "npm run test -w @haulnumbers/core && npm run test -w @haulnumbers/web",
-    "typecheck": "npm run typecheck -w @haulnumbers/core && npm run check -w @haulnumbers/web",
+    "test": "npm run test -w @haulnumbers/core && npm run test -w @haulnumbers/web && npm run test -w @haulnumbers/mobile",
+    "typecheck": "npm run typecheck -w @haulnumbers/core && npm run check -w @haulnumbers/web && npm run typecheck -w @haulnumbers/mobile",
     "build:web": "npm run build -w @haulnumbers/web",
     "dev:web": "npm run dev -w @haulnumbers/web",
-    "check:compliance": "npm run check:compliance -w @haulnumbers/web"
+    "check:compliance": "npm run check:compliance -w @haulnumbers/web",
+    "bundle:mobile": "npm run bundle -w @haulnumbers/mobile"
+  },
+  "overrides": {
+    "react-native": "0.86.3",
+    "react": "19.2.3"
   }
 }

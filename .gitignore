@@ -4,3 +4,14 @@ dist
 .env
 .env.*
 !.env.example
+
+# mobile app build output (generated)
+apps/mobile/android
+apps/mobile/ios
+apps/mobile/.expo
+apps/mobile/dist-android
+apps/mobile/expo-env.d.ts
+*.apk
+*.aab
+*.keystore
+*.jks

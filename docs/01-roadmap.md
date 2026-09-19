@@ -41,10 +41,10 @@ Each phase has **deliverables** and **exit criteria**. Do not start monetization
 ## Phase 3 · Android app + AdMob
 | # | Task | Size |
 |---|---|---|
-| 3.1 | `apps/mobile` Expo app (TypeScript), imports `@haulnumbers/core` | M |
-| 3.2 | Screens for the 5 calculators, offline, saved scenarios (local storage) | L |
-| 3.3 | Navigation, theming (dark mode), accessibility, tablet layout | M |
-| 3.4 | AdMob, following the App rules in doc 05: adaptive banner on calculator screens only; interstitial only when leaving a calculator screen (never on launch/exit/while typing); UMP consent gating the ads SDK; test ids in dev | M |
+| 3.1 | `apps/mobile` Expo app (TypeScript, Expo SDK 57, expo-router), imports `@haulnumbers/core`: **✅** typecheck clean, 48 Jest tests, full Hermes bundle builds | M |
+| 3.2 | Screens for the 5 calculators, offline: **✅ all five** (results verified equal to the website in tests). **Saved scenarios not built yet** | L |
+| 3.3 | Navigation ✅, dark mode ✅, 48dp touch targets and accessibility labels ✅; **still open:** tablet layout and a TalkBack pass on a real device | M |
+| 3.4 | AdMob, following the App rules in doc 05: **code and tests ✅** (consent-gated init, banner only on calculator screens and hidden while typing, interstitial only when leaving a screen, test ids in dev, fail-closed release ids); **still open:** verification on a real device or emulator (consent form, test ads) | M |
 | 3.5 | Test ads only until release; App Store listing: title, description, screenshots, feature graphic | M |
 | 3.6 | Play Console: data safety form, content rating, privacy policy URL, target-API compliance | M |
 | 3.7 | Closed testing: 12 testers opted in for 14 days if the account is a personal account created after 2023-11-13 (otherwise exempt; see doc 05) | M + wait |

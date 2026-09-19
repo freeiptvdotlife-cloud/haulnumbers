@@ -29,6 +29,15 @@ Free, fast, global; matches available tooling. Alternative: Netlify/Vercel. Deci
 ## ADR-009 · IFTA v1 scope: diesel, 48 U.S. states, rates read from IFTA, Inc.'s own matrix · accepted
 Rates are scraped from the official matrix by a strict, tested tool (no third-party rate sites: they disagreed with the source, e.g. on Kentucky's surcharge). Rules follow the standard IFTA return instructions (rounding, surcharge never a credit). Canada, gasoline and other fuels are deferred until search data shows demand. Trade-off: the tool depends on the matrix's HTML; it fails loudly on any change, so the failure mode is "no update", never "wrong rate".
 
+## ADR-010 · Single React / React Native version pinned by root `overrides` · accepted
+Expo packages declare `react-native: *`, so npm hoisted 0.87.1 while the app pinned Expo's 0.86.3: two copies in one monorepo. `overrides` in the root `package.json` force one version (RN 0.86.3, React 19.2.3). Re-check on every Expo SDK upgrade: bump both together.
+
+## ADR-011 · Interstitial rules live in a pure, tested policy with one trigger · accepted
+AdMob forbids interstitials on launch/exit and while the user is mid-task, and our calculators are forms that recalculate as you type. So `InterstitialPolicy` exposes a single entry point, leaving a calculator screen after a result was viewed, and a test fails if anyone adds another. Numbers (60 s, 180 s, every 3rd leave) are conservative defaults to tune with data.
+
+## Accepted npm advisories (mobile dependency tree)
+`npm audit` reports 14 moderate findings from two advisories, both inside Expo's own dependencies: `uuid` (missing bounds check when a buffer is passed, reached via native-project build tooling) and `decode-uri-component` (slow decoding of malformed percent-encoded input, reached via `query-string`). The offered "fixes" are downgrades to Expo 46 / expo-router 5, which we reject. Neither package is in the shipped Android bundle (verified by searching the Hermes bytecode). Re-run `npm audit` and re-verify at every Expo upgrade; remove this entry when upstream fixes them.
+
 ## Open questions
 | # | Question | Needed by | How to resolve |
 |---|---|---|---|

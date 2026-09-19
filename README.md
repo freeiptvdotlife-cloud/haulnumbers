@@ -7,15 +7,16 @@ Domain (planned): `haulnumbers.com` · Android package (planned): `com.haulnumbe
 ```
 packages/core   Pure TypeScript calculation engine (no DOM, no I/O). Shared by web and app.
 apps/web        Astro static site (SEO pages + calculator islands).
-apps/mobile     Expo / React Native Android app (Phase 3, not yet created).
+apps/mobile     Expo (SDK 57) Android app: the five calculators plus consent-gated AdMob.
 docs/           Planning and engineering docs (start here).
 ```
 
 ## Commands
 ```bash
 npm install
-npm test               # core unit tests + compliance-gate tests
-npm run typecheck      # core + web
+npm test               # core + compliance-gate + mobile tests
+npm run typecheck      # core + web + mobile
+npm run bundle:mobile  # full Android Hermes bundle (proves the shared core bundles)
 npm run dev:web        # local dev server
 npm run build:web      # static build to apps/web/dist
 npm run check:compliance   # AdSense compliance gate on the built site (see docs/05, docs/06)
@@ -35,4 +36,4 @@ npm run update:ifta-rates -w @haulnumbers/core -- 2026Q4   # refresh IFTA rates 
 | [07-decisions](docs/07-decisions.md) | Decision log and open questions |
 
 ## Status
-Phase 0 complete. Phase 1 in progress: all five calculators are built (cost per mile, load profit, detention pay, IFTA, per diem; core + tests + web pages). Shared UI components and the calculators hub are done. Remaining: a11y/Lighthouse pass (needs a real browser), per-tool content review. See the roadmap.
+Phase 0 complete. Phase 1 in progress: all five calculators are built (cost per mile, load profit, detention pay, IFTA, per diem; core + tests + web pages). Shared UI components and the calculators hub are done. Phase 3 in progress: the Android app has all five calculators and the consent-gated ad layer (tests and bundle green); a native build and on-device checks are pending. See the roadmap.
