@@ -34,4 +34,4 @@ npm run update:ifta-rates -w @haulnumbers/core -- 2026Q4   # refresh IFTA rates 
 | [07-decisions](docs/07-decisions.md) | Decision log and open questions |
 
 ## Status
-Phase 0 complete. Phase 1 in progress: all five calculators are built (cost per mile, load profit, detention pay, IFTA, per diem; core + tests + web pages). Shared UI components done. Remaining: hub pages, a11y/Lighthouse pass, per-tool content review. See the roadmap.
+Phase 0 complete. Phase 1 in progress: all five calculators are built (cost per mile, load profit, detention pay, IFTA, per diem; core + tests + web pages). Shared UI components and the calculators hub are done. Remaining: a11y/Lighthouse pass (needs a real browser), per-tool content review. See the roadmap.

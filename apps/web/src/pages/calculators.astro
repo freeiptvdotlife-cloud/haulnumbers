@@ -1,0 +1,55 @@
+---
+import Base from "../layouts/Base.astro";
+import { TOOLS, TOOL_GROUPS } from "../data/tools";
+import { SITE_URL } from "../data/site";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Trucking calculators for owner-operators",
+  itemListElement: TOOLS.map((t, i) => ({ "@type": "ListItem", position: i + 1, name: t.name, url: SITE_URL + t.path })),
+};
+---
+<Base
+  title="Free Trucking Calculators for Owner-Operators"
+  description="Free calculators for owner-operator truckers: cost per mile, load profit with deadhead, detention pay, IFTA fuel tax and per diem. Every formula is shown and every rate is sourced."
+  jsonLd={jsonLd}
+>
+  <h1>Trucking calculators for owner-operators</h1>
+  <p>Five free calculators that cover the numbers an owner-operator works out again and again: what a mile costs you, whether a load is worth taking, what waiting time is worth, and what you owe or can deduct at tax time. There is nothing to sign up for, and your figures stay in your browser.</p>
+
+  {TOOL_GROUPS.map((g) => (
+    <section>
+      <h2>{g.title}</h2>
+      <p class="intro">{g.intro}</p>
+      <ul class="related">
+        {TOOLS.filter((t) => t.group === g.id).map((t) => (
+          <li class="card">
+            <a href={t.path}><strong>{t.name}</strong></a>
+            <p>{t.blurb}</p>
+            <p>{t.useWhen}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+
+  <section>
+    <h2>How the calculators fit together</h2>
+    <ol>
+      <li>Start with the <a href="/cost-per-mile-calculator/">cost per mile calculator</a>. Your break-even rate per mile is the floor for everything else.</li>
+      <li>When a load is offered, run it through the <a href="/load-profit-calculator/">load profit calculator</a>. It adds deadhead miles and broker or factoring fees, so you see the rate you really keep. The non-fuel part of your cost per mile goes in there.</li>
+      <li>If you are kept waiting, the <a href="/detention-pay-calculator/">detention pay calculator</a> shows what to invoice, and the amount can go back into the load profit calculator as an accessorial.</li>
+      <li>Each quarter, use the <a href="/ifta-calculator/">IFTA calculator</a> to estimate your fuel tax, which is part of your true operating cost.</li>
+      <li>At tax time, the <a href="/per-diem-calculator/">per diem calculator</a> estimates your meal deduction for days away from home.</li>
+    </ol>
+
+    <h2>Where the numbers come from</h2>
+    <p>Each calculator shows its formula and a worked example. Where a tool depends on official data, the page says where it came from and when we retrieved it. IFTA diesel rates are read from the fuel tax matrix published by IFTA, Inc., and per diem rates come from the IRS notice for the current period. Quarters IFTA has not finalised are labelled preliminary.</p>
+    <p>These are estimates based on what you enter, not financial, tax or legal advice. Contract terms, your base jurisdiction and your own tax situation decide the real figures, so check them before you rely on a result.</p>
+  </section>
+
+  <style>
+    .intro { color: var(--muted); margin-top: 0; }
+  </style>
+</Base>

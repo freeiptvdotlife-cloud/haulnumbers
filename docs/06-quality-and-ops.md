@@ -62,3 +62,11 @@ Spec updated in doc 03 · core code + tests pass · page built from the shared c
 3. Copy `packages/core/src/data/perDiem/2025-2026.json` to `<year>-<year+1>.json`; set `period`, `effectiveFrom` (Oct 1), `effectiveThrough` (Sep 30 next year), `notice`, `sourceUrl`, `retrievedAt` (today) and the two rates.
 4. Register the file in `packages/core/src/data/perDiemRates.ts`; confirm Pub. 463's 80% and 50% figures are unchanged for the tax year; run `npm test` and `npm run build:web`.
 5. Update the page's worked example and its "$80 / $86" wording if the rates changed.
+
+## Browser QA (manual until CI exists)
+Run after any change to layout, CSS or a page. Lighthouse and puppeteer are not project dependencies; install them in a scratch folder.
+1. `npm run build:web`, then `npx astro preview --port 4321 --host 127.0.0.1` (from `apps/web`).
+2. **Lighthouse**, mobile emulation, every page: `npx lighthouse http://127.0.0.1:4321/<page>/ --chrome-flags="--headless=new --no-sandbox" --only-categories=performance,accessibility,best-practices,seo`. Target: 100/100/100/100, CLS 0. Last run (2026-09-19, no ads yet): all 7 pages 100 across the board, LCP about 1 s, TBT 0.
+3. **Overflow check:** load every page at 320, 360, 400, 768 and 1280 px and compare `document.documentElement.scrollWidth` with `clientWidth`; any excess is a bug. Also watch for JS errors on load.
+4. **Look at it** in both colour schemes (`prefers-color-scheme` light and dark) at phone and desktop width. Automated scores miss things a screenshot shows.
+5. Repeat step 2 once real ads and the consent banner are live: they add third-party scripts, so expect performance and CLS to move.

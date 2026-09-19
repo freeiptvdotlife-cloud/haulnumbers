@@ -4,14 +4,18 @@
  * rendered, so scoped rules never reach them.
  */
 label { display:grid; gap:4px; font-size:14px; color:var(--muted); }
-input, select, button.add, button.rm { font:inherit; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--fg); min-height:44px; }
+input, select, button.add, button.rm { min-width:0; max-width:100%; font:inherit; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--fg); min-height:44px; }
 input:focus-visible, select:focus-visible, button:focus-visible { outline:3px solid var(--accent); outline-offset:1px; }
 [aria-invalid="true"] { border-color:var(--bad); }
 .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 .hint { color:var(--muted); font-size:14px; margin:12px 0 0; }
 
-fieldset.fields { border:0; padding:0; margin:0 0 16px; display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
+/* A fieldset defaults to min-width:min-content, which stops its grid shrinking below the widest
+   <select> option and pushes the page wider than a phone screen. min-width:0 lets it shrink. */
+fieldset { min-width:0; }
+fieldset.fields { border:0; padding:0; margin:0 0 16px; display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr)); }
 fieldset.block { border:0; padding:0; margin:0 0 16px; }
+label { min-width:0; }
 fieldset legend { font-weight:700; margin-bottom:8px; padding:0; width:100%; }
 
 /* Results */

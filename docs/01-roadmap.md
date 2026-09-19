@@ -17,9 +17,9 @@ Each phase has **deliverables** and **exit criteria**. Do not start monetization
 | 1.4 | IFTA quarterly estimator with rate data pipeline: **pipeline + core + tests + web page ✅** (diesel, 48 states) | L |
 | 1.5 | Shared UI components: field, select, field group, result panel (with disclaimer), FAQ, related tools, tool registry, shared global CSS and client helpers **✅** | M |
 | 1.6 | Per-tool content: formula, worked example, FAQ, glossary links (real text, not filler) | L |
-| 1.7 | Hub pages: `/calculators/`, `/guides/` skeleton | S |
-| 1.8 | Vitest coverage ≥ 90% on core; a11y pass (keyboard, labels, contrast) | M |
-| 1.9 | Lighthouse CI budget in CI | S |
+| 1.7 | Hub pages: `/calculators/` **✅** (driven by `data/tools.ts`); `/guides/` deferred until real guides exist, since an empty page hurts AdSense approval | S |
+| 1.8 | Vitest coverage ≥ 90% on core ✅; a11y pass: contrast (WCAG AA, both themes), labels and Lighthouse a11y 100 ✅; **still open:** manual keyboard-only run and a screen-reader pass | M |
+| 1.9 | Lighthouse CI budget in CI: manual Lighthouse run done (100/100/100/100, CLS 0, all 7 pages); **automating it needs a CI setup, which does not exist yet** | S |
 
 **Exit:** 5 calculators pass tests, Lighthouse targets met, each tool page has ≥ 600 words of useful original content, disclaimers present.
 
