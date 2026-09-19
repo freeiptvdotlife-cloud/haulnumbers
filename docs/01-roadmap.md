@@ -18,7 +18,7 @@ Each phase has **deliverables** and **exit criteria**. Do not start monetization
 | 1.5 | Shared UI components: field, select, field group, result panel (with disclaimer), FAQ, related tools, tool registry, shared global CSS and client helpers **✅** | M |
 | 1.6 | Per-tool content: formula, worked example, FAQ, glossary links (real text, not filler) | L |
 | 1.7 | Hub pages: `/calculators/` **✅** (driven by `data/tools.ts`); `/guides/` deferred until real guides exist, since an empty page hurts AdSense approval | S |
-| 1.8 | Vitest coverage ≥ 90% on core ✅; a11y pass: contrast (WCAG AA, both themes), labels and Lighthouse a11y 100 ✅; **still open:** manual keyboard-only run and a screen-reader pass | M |
+| 1.8 | Vitest coverage ≥ 90% on core ✅; a11y pass: contrast (WCAG AA, both themes), labels and Lighthouse a11y 100 ✅; keyboard-only pass ✅ (tab order, focus rings, accessible names, skip link, IFTA add/remove/typing); **still open:** a screen-reader pass with real assistive tech | M |
 | 1.9 | Lighthouse CI budget in CI: manual Lighthouse run done (100/100/100/100, CLS 0, all 7 pages); **automating it needs a CI setup, which does not exist yet** | S |
 
 **Exit:** 5 calculators pass tests, Lighthouse targets met, each tool page has ≥ 600 words of useful original content, disclaimers present.
@@ -29,11 +29,12 @@ Each phase has **deliverables** and **exit criteria**. Do not start monetization
 | 2.1 | Buy domain (`haulnumbers.com`, verify availability first), enable auto-renew, WHOIS privacy | S |
 | 2.2 | Cloudflare Pages project, custom domain, HTTPS, www→apex redirect, security headers | S |
 | 2.3 | Search Console (domain property), submit sitemap, IndexNow ping on deploy | S |
-| 2.4 | Privacy Policy, About, Contact (real email), Terms/Disclaimer complete | S |
+| 2.4 | Privacy, About, Contact and Terms pages ✅ built (privacy policy meets the checklist in doc 05); **needs a real contact email**, which requires the domain | S |
 | 2.5 | Consent management (Google-certified CMP for EEA/UK/CH) | M |
 | 2.6 | Privacy-friendly analytics (Cloudflare Web Analytics) | S |
 | 2.7 | Apply for AdSense; add `ads.txt`; fix any rejection reasons | S + wait |
-| 2.8 | Create ad units, set `PUBLIC_ADSENSE_CLIENT` / slot env vars, verify no CLS | M |
+| 2.8 | Create ad units, set `PUBLIC_ADSENSE_CLIENT` / slot env vars and `ADS_TXT`, verify no CLS | M |
+| 2.9 | **Compliance gate:** `npm run build:web && npm run check:compliance` with production env must pass before every deploy (built and tested; see doc 05) | S |
 
 **Exit:** site live and indexed, AdSense approved, ads render without CLS regressions, consent works.
 
@@ -43,7 +44,7 @@ Each phase has **deliverables** and **exit criteria**. Do not start monetization
 | 3.1 | `apps/mobile` Expo app (TypeScript), imports `@haulnumbers/core` | M |
 | 3.2 | Screens for the 5 calculators, offline, saved scenarios (local storage) | L |
 | 3.3 | Navigation, theming (dark mode), accessibility, tablet layout | M |
-| 3.4 | AdMob: banner (adaptive), interstitial at natural breaks, UMP consent flow | M |
+| 3.4 | AdMob, following the App rules in doc 05: adaptive banner on calculator screens only; interstitial only when leaving a calculator screen (never on launch/exit/while typing); UMP consent gating the ads SDK; test ids in dev | M |
 | 3.5 | Test ads only until release; App Store listing: title, description, screenshots, feature graphic | M |
 | 3.6 | Play Console: data safety form, content rating, privacy policy URL, target-API compliance | M |
 | 3.7 | Closed testing: 12 testers opted in for 14 days if the account is a personal account created after 2023-11-13 (otherwise exempt; see doc 05) | M + wait |

@@ -8,7 +8,6 @@ interface Props {
 }
 const { title, description, jsonLd } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
-const adsenseClient = import.meta.env.PUBLIC_ADSENSE_CLIENT;
 const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 <!doctype html>
@@ -28,21 +27,19 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta property="og:url" content={canonical} />
     <meta name="twitter:card" content="summary" />
     {ld.map((o) => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
-    {adsenseClient && (
-      <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`} crossorigin="anonymous"></script>
-    )}
   </head>
   <body>
+    <a class="skip" href="#main">Skip to content</a>
     <header class="site">
       <a class="brand" href="/">Haul Numbers</a>
       <nav aria-label="Main">
         {TOOLS.map((t, i) => (<Fragment>{i > 0 && " · "}<a href={t.path}>{t.navLabel}</a></Fragment>))}
       </nav>
     </header>
-    <main><slot /></main>
+    <main id="main" tabindex="-1"><slot /></main>
     <footer class="site">
       <p>© {new Date().getFullYear()} Haul Numbers. Estimates only, not financial, tax or legal advice.</p>
-      <nav aria-label="Footer"><a href="/calculators/">All calculators</a> · <a href="/about/">About</a> · <a href="/privacy/">Privacy</a></nav>
+      <nav aria-label="Footer"><a href="/calculators/">All calculators</a> · <a href="/about/">About</a> · <a href="/contact/">Contact</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a></nav>
     </footer>
     <style is:global>
       :root { --bg:#f7f8f6; --fg:#15211c; --muted:#5b6b64; --brand:#0b3d2e; --accent:#f5b301; --card:#fff; --line:#dfe5e1; --bad:#b3261e; }
@@ -57,6 +54,10 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
       h1 { line-height:1.2; margin:24px 0 8px; }
       .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
       .ad { margin:24px 0; text-align:center; }
+      .ad-label { margin:0 0 4px; font-size:12px; line-height:16px; color:var(--muted); }
+      .skip { position:absolute; left:-999px; top:8px; background:var(--card); color:var(--fg); border:2px solid var(--accent); border-radius:8px; padding:8px 12px; z-index:10; }
+      .skip:focus { left:8px; }
+      main:focus { outline:none; }
     </style>
   </body>
 </html>

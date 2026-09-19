@@ -3,6 +3,44 @@
 > Policies change. Treat this as a working checklist and re-read the current AdSense, AdMob and Google Play policy pages before each submission.
 > **Last verified: 2026-09-19** against Google's own help pages (linked inline). Items still marked **verify** were not confirmed against a primary source.
 
+## Compliance matrix (verified 2026-09-19 against Google's own pages)
+Sources: [AdSense ad placement policies](https://support.google.com/adsense/answer/1346295), [AdSense Program policies](https://support.google.com/adsense/answer/48182), [Publisher Policies (valuable inventory)](https://support.google.com/publisherpolicies/answer/11112688), [AdMob interstitial guidance](https://support.google.com/admob/answer/6066980), [AdMob disallowed interstitials](https://support.google.com/admob/answer/6201362), [AdMob app-ads.txt](https://support.google.com/admob/answer/9363762), [AdSense ads.txt guide](https://support.google.com/adsense/answer/12171612), [EU user consent policy](https://support.google.com/adsense/answer/10961068).
+
+### Web (AdSense)
+| Rule (paraphrased from the source) | How we comply | Enforced by |
+|---|---|---|
+| Never click your own ads; no incentives for clicks | No self-clicks; dev builds render no ads; wording never invites clicks | `click-inducing-text` check; process rule |
+| Ads must not look like menus, navigation or download links; no buttons or navigation next to ads | One slot per page, after the results panel, never between fields or beside a button; slot has its own margin | Layout review (`AdSlot`); QA step |
+| Labels may only be "Advertisement" or "Sponsored links"; no "help keep this site running" style wording | Visible "Advertisement" caption on every slot | `ad-label` and `click-inducing-text` checks |
+| No ads on pages without publisher content (thank-you, error, exit, thin pages) | Ads only on the 5 calculator pages (each 500+ words). Never on home, hub, about, contact, privacy, terms or 404 | `ad-placement` and `thin-content` checks |
+| Low-value or unfinished content can lose ad serving | Original explanations, worked examples, sourced data; no "coming soon" pages (so no `/guides/` yet) | `thin-content` check (300+ words in main content); content review |
+| No auto-refresh, pop-ups, new-window ads | Standard responsive units only; no refresh code | Code review |
+| Ad crawler must be able to read pages | `robots.txt` allows everything; nothing blocks Mediapartners-Google | `robots` check |
+| Privacy policy discloses Google ad cookies and offers opt-outs; EEA/UK/CH users get a Google-certified TCF v2.3 CMP | Privacy page covers cookies, third-party vendors, Ads Settings, aboutads.info, Google's ad-technology and Business Data Responsibility pages; CMP set up in AdSense "Privacy & messaging" at approval | `privacy-policy` check; Phase 2.5 |
+| `ads.txt` with the exact AdSense snippet (`google.com, pub-…, DIRECT, f08c47fec0942fa0`) | `/ads.txt` is generated from the `ADS_TXT` build variable | `ads.txt` check |
+| Real contact route | `/contact/` shows `PUBLIC_CONTACT_EMAIL`; a monetised build fails without it | `contact` check |
+
+**AdSense loader scope:** the `adsbygoogle.js` script is included by `AdSlot`, so it loads only on pages with a slot. If Auto ads were ever enabled they could otherwise reach privacy, terms and contact.
+
+**Run before every deploy:** `npm run build:web && npm run check:compliance` with the same environment variables as the build. It exits non-zero on any violation. It is a safety net for the mechanical rules; it does not replace reading the policies.
+
+### App (AdMob), rules that shape the design
+| Rule | Design consequence |
+|---|---|
+| Interstitials only at logical breaks between pages of content; **not on app launch or exit**; not placed so they appear while the user is focused on a task such as **filling out a form**; not after every user action | Our calculators are forms that recalculate as you type, so an interstitial can **never** be tied to "after a calculation". It is shown only when the user **leaves a calculator screen** (back to the list) after they have viewed a result, at most once per N screen changes and once per several minutes, pre-loaded, never in the first session minute, never on launch/exit/back-out of the app, never while a field is focused |
+| No ads on screens without publisher content (loading, splash, empty, error, consent, settings screens) | Ads render only on the five calculator screens. Splash, list, settings and consent screens carry none |
+| Banners must not overlap or sit next to controls in a way that invites accidental clicks | Adaptive banner docked at the bottom, outside the scroll area, with clear space above it and never under the keyboard or a button |
+| Never click own ads; use test ads in development | `TestIds` in `__DEV__` and on registered test devices; real unit ids only in release builds, injected via config |
+| Consent before ads in EEA/UK/CH (Google-certified CMP, TCF v2.3) | Google's UMP SDK: request consent info on launch, show the form when required, and **do not initialise the ads SDK or request ads until consent allows it**; a "Privacy settings" entry in the app to reopen the form |
+| `app-ads.txt` on the developer website named in the Play listing | `/app-ads.txt` is generated from the `APP_ADS_TXT` build variable (needs the domain) |
+| Native/rewarded formats have their own rules | Not used at launch; rewarded only as an explicit opt-in (Phase 5), native only with visible "Ad" attribution |
+
+### Not yet verified (do not treat as confirmed)
+- `https://business.safety.google/privacy/` (Google Business Data Responsibility page) is linked from the privacy policy because Google's EU consent policy asks for it, but the URL could not be fetched from this environment. Open it once and confirm before launch.
+- Exact UMP SDK behaviour and the current `react-native-google-mobile-ads` consent API: read their docs when Phase 3.4 starts.
+- Whether the AdSense-provided CMP message needs a footer "Privacy settings" link on this site so users can change their choice later (the EU policy expects users to be able to withdraw consent). Check when the message is configured in the AdSense console, and add the link if needed.
+- Google Play data safety form answers for the AdMob SDK: complete from the SDK's own data-disclosure page in Phase 3.6.
+
 ## Principles
 1. Ads follow value: no ad placement that hurts a tool's usability.
 2. Invalid traffic is an existential risk. **Never click your own ads**, never ask others to, never use incentives for clicks. Use test ads in development and on-device test IDs in the app.
@@ -42,7 +80,7 @@ Tax and financial pages must avoid guarantees and advice claims. Keep disclaimer
 | Format | Use | Guardrails |
 |---|---|---|
 | Adaptive banner | Bottom of screen | Not overlapping controls or inputs; not in scrolling lists between form fields |
-| Interstitial | After a completed calculation or when leaving a result, capped (e.g., not more than once per 3 calculations and not within the first minute) | Never on app open, never on back-press exit, never mid-input; no surprise or accidental-click triggers |
+| Interstitial | Only when leaving a calculator screen after a result was viewed (see the App matrix above), capped by count and time | Never on app open or exit, never while a field is focused or the user is typing, never after every action; pre-load so it does not appear late |
 | Rewarded | Optional: "Watch an ad to export PDF / save scenario" | Must be explicit opt-in with clear reward |
 | Native | Later, in the saved-scenarios list | Must be visually distinguishable |
 

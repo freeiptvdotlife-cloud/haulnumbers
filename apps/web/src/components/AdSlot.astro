@@ -1,19 +1,43 @@
 ---
 /**
- * Reserved-height ad slot. Renders nothing until PUBLIC_ADSENSE_CLIENT is set,
- * so there is no layout shift and no ad code in dev or pre-approval builds.
- * `slot` is the AdSense ad unit id created in the AdSense dashboard.
+ * Reserved-height ad slot. Renders nothing until PUBLIC_ADSENSE_CLIENT and that page's slot id
+ * are set, so there is no layout shift and no ad code in dev or pre-approval builds.
+ *
+ * The AdSense loader script is included HERE, not in the shared layout: it therefore loads only
+ * on pages that actually contain a slot, and never on privacy/about/contact/terms (so Auto ads,
+ * if ever switched on in the AdSense console, cannot place ads on those pages).
+ *
+ * Env values must be read in frontmatter: `import.meta.env.X` written inside a page's template
+ * expression is not replaced at build time, which would silently render no ads.
+ *
+ * Policy notes (Google AdSense placement policies):
+ *  - the label must be "Advertisement" (or "Sponsored links"); never wording that invites clicks;
+ *  - keep buttons, links and navigation away from ads (accidental-click rule): slots sit after the
+ *    results panel, never between form fields or beside a button;
+ *  - only put slots on pages with real publisher content, never on non-content pages.
+ * `scripts/check-compliance.mjs` enforces placement, labelling and configuration on the built site.
  */
+type AdPage = "cpm" | "load" | "detention" | "ifta" | "perdiem";
 interface Props {
-  slot?: string;
+  page: AdPage;
   minHeight?: number;
 }
-const { slot, minHeight = 280 } = Astro.props;
+const { page, minHeight = 280 } = Astro.props;
+const slots: Record<AdPage, string | undefined> = {
+  cpm: import.meta.env.PUBLIC_ADSENSE_SLOT_CPM,
+  load: import.meta.env.PUBLIC_ADSENSE_SLOT_LOAD,
+  detention: import.meta.env.PUBLIC_ADSENSE_SLOT_DETENTION,
+  ifta: import.meta.env.PUBLIC_ADSENSE_SLOT_IFTA,
+  perdiem: import.meta.env.PUBLIC_ADSENSE_SLOT_PERDIEM,
+};
 const client = import.meta.env.PUBLIC_ADSENSE_CLIENT;
+const slot = slots[page];
 const enabled = Boolean(client && slot);
 ---
 {enabled && (
-  <aside class="ad" style={`min-height:${minHeight}px`} aria-label="Advertisement">
+  <aside class="ad" style={`min-height:calc(${minHeight}px + 20px)`} aria-label="Advertisement">
+    <p class="ad-label">Advertisement</p>
+    <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`} crossorigin="anonymous"></script>
     <ins class="adsbygoogle" style="display:block" data-ad-client={client} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true"></ins>
     <script is:inline>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </aside>

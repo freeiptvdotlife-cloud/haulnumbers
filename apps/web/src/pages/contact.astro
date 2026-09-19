@@ -1,0 +1,19 @@
+---
+import Base from "../layouts/Base.astro";
+const email = import.meta.env.PUBLIC_CONTACT_EMAIL;
+---
+<Base title="Contact Haul Numbers" description="How to contact Haul Numbers about a calculator, a rate or formula correction, privacy questions or a suggestion.">
+  <h1>Contact</h1>
+  <p>We read every message. The most useful ones are corrections: if a formula, a rate or a worked example on any calculator looks wrong to you, tell us which page and what you expected, and we will check it against the source.</p>
+  <h2>Email</h2>
+  {email
+    ? <p><a href={`mailto:${email}`}>{email}</a></p>
+    : <p class="unset">The contact address is not configured in this build. Set <code>PUBLIC_CONTACT_EMAIL</code> before publishing.</p>}
+  <h2>What to write about</h2>
+  <ul>
+    <li>A rate, formula or example that looks incorrect (include the page, your inputs and the result you saw).</li>
+    <li>A privacy question or a request about data, see the <a href="/privacy/">privacy policy</a>.</li>
+    <li>A calculator you would like us to add.</li>
+  </ul>
+  <p>We cannot give tax, legal or financial advice. For that, please speak to a qualified professional.</p>
+</Base>

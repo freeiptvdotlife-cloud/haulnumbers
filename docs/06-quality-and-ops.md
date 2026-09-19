@@ -13,7 +13,7 @@
 | Mobile | Jest + React Native Testing Library; manual device matrix (low-end and current Android) | |
 
 ## CI pipeline (GitHub Actions)
-On every PR: install with lockfile → `npm audit --omit=dev` (warn) → typecheck → test → build web → Lighthouse CI → (Phase 3) mobile typecheck and unit tests.
+On every PR: install with lockfile → `npm audit --omit=dev` (warn) → typecheck → test (core and web script tests) → build web → **`npm run check:compliance`** → Lighthouse CI → (Phase 3) mobile typecheck and unit tests.
 On `main`: deploy web to Cloudflare Pages, then ping IndexNow for changed URLs. Mobile release builds run on tags via EAS.
 
 ## Branching and releases
@@ -47,7 +47,7 @@ Search Console (indexing, CWV, manual actions), AdSense policy center and RPM, A
 | Domain/registrar mishap | Low | High | Auto-renew, 2FA, domain lock |
 
 ## Definition of done (per calculator)
-Spec updated in doc 03 · core code + tests pass · page built from the shared components and registered in `data/tools.ts` · page content written and reviewed for accuracy · a11y checked · Lighthouse budget met · structured data valid · added to hub and related-tools · sitemap updated · disclaimer present · (if data-driven) data file sourced and dated.
+Compliance check passes (ad-free and monetised) · Spec updated in doc 03 · core code + tests pass · page built from the shared components and registered in `data/tools.ts` · page content written and reviewed for accuracy · a11y checked · Lighthouse budget met · structured data valid · added to hub and related-tools · sitemap updated · disclaimer present · (if data-driven) data file sourced and dated.
 
 ## Quarterly IFTA rate update (runbook)
 1. From the repo root: `npm run update:ifta-rates -w @haulnumbers/core -- 2026Q4 2027Q1` (list every quarter to refresh, including newly published ones). It downloads from IFTA, Inc., validates, and rewrites `packages/core/src/data/ifta/*.json`.
@@ -69,4 +69,11 @@ Run after any change to layout, CSS or a page. Lighthouse and puppeteer are not 
 2. **Lighthouse**, mobile emulation, every page: `npx lighthouse http://127.0.0.1:4321/<page>/ --chrome-flags="--headless=new --no-sandbox" --only-categories=performance,accessibility,best-practices,seo`. Target: 100/100/100/100, CLS 0. Last run (2026-09-19, no ads yet): all 7 pages 100 across the board, LCP about 1 s, TBT 0.
 3. **Overflow check:** load every page at 320, 360, 400, 768 and 1280 px and compare `document.documentElement.scrollWidth` with `clientWidth`; any excess is a bug. Also watch for JS errors on load.
 4. **Look at it** in both colour schemes (`prefers-color-scheme` light and dark) at phone and desktop width. Automated scores miss things a screenshot shows.
-5. Repeat step 2 once real ads and the consent banner are live: they add third-party scripts, so expect performance and CLS to move.
+5. **Keyboard-only pass:** press Tab through every page. Each control needs a visible focus ring and an accessible name, the order must follow the layout, the first stop must be the skip link, and the IFTA add/remove buttons must work with Enter and Space. (Note: `type="time"` inputs legitimately have several tab stops: hours, minutes, AM/PM.)
+6. Repeat step 2 once real ads and the consent banner are live: they add third-party scripts, so expect performance and CLS to move.
+
+## Compliance gate
+`apps/web/scripts/complianceCheck.mjs` inspects the built `dist/` (or any folder passed as an argument) and fails on: ads or the AdSense script on non-content pages, an ad without an "Advertisement" label, thin ad pages, click-inducing wording, a privacy policy missing required disclosures, missing legal/contact pages, a bad or missing `ads.txt`, a missing contact email or ad unit in a monetised build, and a `robots.txt` that blocks crawlers. `node --test` covers each rule with a passing and a failing fixture (`npm test`).
+- Ad-free build (current): `npm run build:web && npm run check:compliance`.
+- Monetised build: set the variables from `apps/web/.env.example` (client id, one slot id per page, `PUBLIC_CONTACT_EMAIL`, `ADS_TXT`), build, then run the check with the **same** variables.
+- Env values used by components must be read in frontmatter. `import.meta.env.X` written inside a page's template expression was not replaced at build time and silently rendered no ad units; the gate's "no ad unit configured" rule caught it.

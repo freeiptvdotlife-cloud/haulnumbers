@@ -14,10 +14,11 @@ docs/           Planning and engineering docs (start here).
 ## Commands
 ```bash
 npm install
-npm test               # core unit tests
+npm test               # core unit tests + compliance-gate tests
 npm run typecheck      # core + web
 npm run dev:web        # local dev server
 npm run build:web      # static build to apps/web/dist
+npm run check:compliance   # AdSense compliance gate on the built site (see docs/05, docs/06)
 npm run update:ifta-rates -w @haulnumbers/core -- 2026Q4   # refresh IFTA rates (see docs/06)
 ```
 
@@ -29,7 +30,7 @@ npm run update:ifta-rates -w @haulnumbers/core -- 2026Q4   # refresh IFTA rates 
 | [02-architecture](docs/02-architecture.md) | Stack, structure, data flow, performance budgets |
 | [03-calculator-specs](docs/03-calculator-specs.md) | Formulas, inputs, edge cases per tool |
 | [04-seo-plan](docs/04-seo-plan.md) | Keyword strategy, page templates, indexing |
-| [05-monetization-compliance](docs/05-monetization-compliance.md) | AdSense, AdMob, consent, Play policy |
+| [05-monetization-compliance](docs/05-monetization-compliance.md) | **Verified AdSense/AdMob rules and how we comply**, consent, Play policy |
 | [06-quality-and-ops](docs/06-quality-and-ops.md) | Testing, CI/CD, data freshness, risks |
 | [07-decisions](docs/07-decisions.md) | Decision log and open questions |
 
