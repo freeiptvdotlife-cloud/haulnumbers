@@ -1,0 +1,9 @@
+---
+import type { Faq } from "../lib/seo";
+interface Props {
+  faqs: readonly Faq[];
+}
+const { faqs } = Astro.props;
+---
+<h2>Frequently asked questions</h2>
+{faqs.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}

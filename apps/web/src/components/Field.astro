@@ -1,0 +1,15 @@
+---
+/** A labelled input. The label text must stay the label's first child: the error messages read it. */
+interface Props {
+  label: string;
+  name: string;
+  type?: "number" | "time" | "text";
+  value?: string | number;
+  inputmode?: "decimal" | "numeric";
+  min?: string | number;
+  max?: string | number;
+  step?: string | number;
+}
+const { label, name, type = "number", value, inputmode, min, max, step } = Astro.props;
+---
+<label>{label} <input name={name} type={type} value={value} inputmode={inputmode} min={min} max={max} step={step} /></label>

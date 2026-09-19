@@ -1,0 +1,207 @@
+{
+  "quarter": "2026Q3",
+  "status": "final",
+  "finalDate": null,
+  "source": "IFTA, Inc. Fuel Tax Matrix",
+  "sourceUrl": "https://www.iftach.org/taxmatrix4/Taxmatrix.php?QY=3Q2026",
+  "retrievedAt": "2026-09-19",
+  "fuel": "special diesel",
+  "unit": "USD per US gallon",
+  "blankDiesel": [
+    "OR"
+  ],
+  "rates": {
+    "AL": {
+      "base": 0.31,
+      "surcharge": 0
+    },
+    "AZ": {
+      "base": 0.26,
+      "surcharge": 0
+    },
+    "AR": {
+      "base": 0.285,
+      "surcharge": 0
+    },
+    "CA": {
+      "base": 0.979,
+      "surcharge": 0
+    },
+    "CO": {
+      "base": 0.335,
+      "surcharge": 0
+    },
+    "CT": {
+      "base": 0.499,
+      "surcharge": 0
+    },
+    "DE": {
+      "base": 0.22,
+      "surcharge": 0
+    },
+    "FL": {
+      "base": 0.4097,
+      "surcharge": 0
+    },
+    "GA": {
+      "base": 0.373,
+      "surcharge": 0
+    },
+    "ID": {
+      "base": 0.32,
+      "surcharge": 0
+    },
+    "IL": {
+      "base": 0.738,
+      "surcharge": 0
+    },
+    "IN": {
+      "base": 0.63,
+      "surcharge": 0
+    },
+    "IA": {
+      "base": 0.325,
+      "surcharge": 0
+    },
+    "KS": {
+      "base": 0.26,
+      "surcharge": 0
+    },
+    "KY": {
+      "base": 0.22,
+      "surcharge": 0.105
+    },
+    "LA": {
+      "base": 0.2,
+      "surcharge": 0
+    },
+    "ME": {
+      "base": 0.312,
+      "surcharge": 0
+    },
+    "MD": {
+      "base": 0.4745,
+      "surcharge": 0
+    },
+    "MA": {
+      "base": 0.24,
+      "surcharge": 0
+    },
+    "MI": {
+      "base": 0.524,
+      "surcharge": 0
+    },
+    "MN": {
+      "base": 0.326,
+      "surcharge": 0
+    },
+    "MS": {
+      "base": 0.24,
+      "surcharge": 0
+    },
+    "MO": {
+      "base": 0.295,
+      "surcharge": 0
+    },
+    "MT": {
+      "base": 0.2975,
+      "surcharge": 0
+    },
+    "NE": {
+      "base": 0.318,
+      "surcharge": 0
+    },
+    "NV": {
+      "base": 0.27,
+      "surcharge": 0
+    },
+    "NH": {
+      "base": 0.222,
+      "surcharge": 0
+    },
+    "NJ": {
+      "base": 0.561,
+      "surcharge": 0
+    },
+    "NM": {
+      "base": 0.21,
+      "surcharge": 0
+    },
+    "NY": {
+      "base": 0.3805,
+      "surcharge": 0
+    },
+    "NC": {
+      "base": 0.41,
+      "surcharge": 0
+    },
+    "ND": {
+      "base": 0.23,
+      "surcharge": 0
+    },
+    "OH": {
+      "base": 0.47,
+      "surcharge": 0
+    },
+    "OK": {
+      "base": 0.19,
+      "surcharge": 0
+    },
+    "OR": {
+      "base": 0,
+      "surcharge": 0
+    },
+    "PA": {
+      "base": 0.741,
+      "surcharge": 0
+    },
+    "RI": {
+      "base": 0.4,
+      "surcharge": 0
+    },
+    "SC": {
+      "base": 0.28,
+      "surcharge": 0
+    },
+    "SD": {
+      "base": 0.28,
+      "surcharge": 0
+    },
+    "TN": {
+      "base": 0.27,
+      "surcharge": 0
+    },
+    "TX": {
+      "base": 0.2,
+      "surcharge": 0
+    },
+    "UT": {
+      "base": 0.379,
+      "surcharge": 0
+    },
+    "VT": {
+      "base": 0.31,
+      "surcharge": 0
+    },
+    "VA": {
+      "base": 0.336,
+      "surcharge": 0.143
+    },
+    "WA": {
+      "base": 0.595,
+      "surcharge": 0
+    },
+    "WV": {
+      "base": 0.357,
+      "surcharge": 0
+    },
+    "WI": {
+      "base": 0.329,
+      "surcharge": 0
+    },
+    "WY": {
+      "base": 0.24,
+      "surcharge": 0
+    }
+  }
+}

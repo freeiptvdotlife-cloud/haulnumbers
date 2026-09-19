@@ -1,0 +1,16 @@
+---
+interface Props {
+  label: string;
+  name: string;
+  options: readonly { value: string; label: string }[];
+  /** Initially selected value; defaults to the first option. */
+  value?: string;
+  id?: string;
+}
+const { label, name, options, value, id } = Astro.props;
+---
+<label>{label}
+  <select name={name} id={id}>
+    {options.map((o) => <option value={o.value} selected={o.value === value}>{o.label}</option>)}
+  </select>
+</label>

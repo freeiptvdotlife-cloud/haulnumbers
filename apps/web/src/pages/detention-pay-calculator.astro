@@ -1,0 +1,186 @@
+---
+import Base from "../layouts/Base.astro";
+import AdSlot from "../components/AdSlot.astro";
+import Field from "../components/Field.astro";
+import SelectField from "../components/SelectField.astro";
+import FieldGroup from "../components/FieldGroup.astro";
+import ResultPanel from "../components/ResultPanel.astro";
+import Faq from "../components/Faq.astro";
+import RelatedTools from "../components/RelatedTools.astro";
+import { toolJsonLd } from "../lib/seo";
+
+const PATH = "/detention-pay-calculator/";
+const faqs = [
+  { q: "What is detention pay in trucking?", a: "Detention pay compensates a driver for waiting at a pickup or delivery beyond the free time allowed in the contract. It is normally an hourly amount that starts once the free time has passed." },
+  { q: "How much free time do I get before detention starts?", a: "Many rate confirmations allow around two hours, but it is set by your contract, so read the terms on the rate confirmation for each load. Enter your own free time in the calculator." },
+  { q: "Is free time counted per stop or for the whole trip?", a: "Usually per stop: the pickup and the delivery each have their own free time. The calculator applies free time to each stop separately and never pools the waiting across stops." },
+  { q: "How are partial hours billed?", a: "That depends on the contract. Some pay exact minutes, others round up to the next 15 or 30 minutes, and some pay per started hour. Choose the billing block that matches your terms." },
+  { q: "What is the difference between detention and layover?", a: "Detention pays for waiting time during a stop. Layover is usually a flat daily amount when you are held overnight or for a full day. Enter layover days and the daily rate to add it to the total." },
+];
+const billingOptions = [
+  { value: "0", label: "Exact minutes" },
+  { value: "15", label: "15 minutes" },
+  { value: "30", label: "30 minutes" },
+  { value: "60", label: "Each started hour" },
+];
+---
+<Base
+  title="Trucking Detention Pay Calculator with Free Time"
+  description="Free detention pay calculator for truck drivers. Enter arrival and departure times, free time and your hourly rate to see what you are owed, including waits past midnight."
+  jsonLd={toolJsonLd({ name: "Trucking Detention Pay Calculator", path: PATH, faqs })}
+>
+  <h1>Trucking detention pay calculator</h1>
+  <p>Enter your arrival and departure times to see the detention pay you are owed. Waits that run past midnight are handled for you.</p>
+
+  <form id="dp" class="card" novalidate>
+    <FieldGroup legend="Pickup (leave blank if none)">
+      <Field label="Pickup arrival" name="pickupArrival" type="time" value="08:00" />
+      <Field label="Pickup departure" name="pickupDeparture" type="time" value="11:15" />
+      <Field label="Pickup days later" name="pickupDays" inputmode="numeric" min="0" step="1" value="0" />
+    </FieldGroup>
+    <FieldGroup legend="Delivery (leave blank if none)">
+      <Field label="Delivery arrival" name="deliveryArrival" type="time" />
+      <Field label="Delivery departure" name="deliveryDeparture" type="time" />
+      <Field label="Delivery days later" name="deliveryDays" inputmode="numeric" min="0" step="1" value="0" />
+    </FieldGroup>
+    <p class="hint">Use “days later” only when you stayed a full day or more. A departure earlier than the arrival is treated as after midnight.</p>
+    <FieldGroup legend="Terms from your rate confirmation">
+      <Field label="Free time per stop (minutes)" name="freeMinutes" inputmode="numeric" min="0" step="1" value="120" />
+      <Field label="Detention rate per hour (USD)" name="hourlyRate" inputmode="decimal" min="0" step="any" value="50" />
+      <SelectField label="Billing blocks" name="billingIncrement" options={billingOptions} value="60" />
+    </FieldGroup>
+    <FieldGroup legend="Layover (optional)">
+      <Field label="Layover days" name="layoverDays" inputmode="numeric" min="0" step="1" value="0" />
+      <Field label="Layover rate per day (USD)" name="layoverRatePerDay" inputmode="decimal" min="0" step="any" value="0" />
+    </FieldGroup>
+  </form>
+
+  <ResultPanel minHeight="24rem">
+    <p slot="before" id="note" class="note" hidden></p>
+    <dl id="res"></dl>
+  </ResultPanel>
+
+  <AdSlot slot={import.meta.env.PUBLIC_ADSENSE_SLOT_DETENTION} />
+
+  <section>
+    <h2>How detention pay is calculated</h2>
+    <ol>
+      <li><strong>Time on site</strong> = departure − arrival for each stop. If the departure clock time is earlier than the arrival, the calculator assumes you left after midnight.</li>
+      <li><strong>Time over free time</strong> = time on site − free time, never below zero. Free time is applied to each stop on its own.</li>
+      <li><strong>Billable time</strong> = time over free time, rounded up to your billing block (exact minutes, 15, 30 or a started hour).</li>
+      <li><strong>Detention pay</strong> = billable hours × hourly rate, added up across stops.</li>
+      <li><strong>Total</strong> = detention pay + layover days × daily layover rate.</li>
+    </ol>
+
+    <h2>Worked examples</h2>
+    <p><strong>Same day.</strong> You arrive at the shipper at 8:00 and leave at 11:15. That is 3 hours 15 minutes on site. With 2 hours of free time, 1 hour 15 minutes is over. If your contract bills each started hour, that rounds up to 2 hours, and at $50 per hour you are owed <strong>$100</strong>. If it paid exact minutes instead, you would be owed 1.25 hours × $50 = $62.50, so the billing terms matter.</p>
+    <p><strong>Past midnight.</strong> You arrive at 22:30 and leave at 01:15 the next morning. The calculator reads that as 2 hours 45 minutes, which is 45 minutes over a 2 hour free time. You do not need to work out the date change yourself.</p>
+    <p><strong>Two stops.</strong> You wait 3 hours at the pickup and 1 hour at the delivery. Only the pickup goes past a 2 hour free time, so only 1 hour is billable. The delivery wait does not offset the pickup wait, because free time belongs to each stop.</p>
+
+    <h2>Waits of a full day or more</h2>
+    <p>Clock times alone cannot tell a 0 hour stay from a 24 hour stay, because both start and end at the same time of day. When you stayed a full day or more, enter the number of days in the “days later” box. For example, arriving at 08:00 and leaving at 08:00 the next day is 1 day later, which is 24 hours on site.</p>
+
+    <h2>Getting paid for detention</h2>
+    <ul>
+      <li>Record your arrival time when you check in, and your departure time when you leave. Timestamps from your check-in, paperwork or logging device support the claim.</li>
+      <li>Ask the shipper or receiver to write the in and out times on the paperwork.</li>
+      <li>Tell the broker or dispatcher when the wait passes your free time, not after delivery.</li>
+      <li>Invoice detention with the times and the terms from your rate confirmation.</li>
+    </ul>
+    <p>Whether detention is owed, the free time, the rate and the billing block all come from your contract. This calculator only does the arithmetic on the numbers you enter, and the result is an estimate, not legal or financial advice. To see what a wait does to the profit on a load, use the <a href="/load-profit-calculator/">load profit calculator</a> and enter the detention amount under accessorials.</p>
+
+    <Faq faqs={faqs} />
+    <RelatedTools current={PATH} />
+  </section>
+
+  <script>
+    import { calculateDetention, minutesBetween, type BillingIncrement } from "@haulnumbers/core";
+    import { bindForm, clearInvalid, fieldLabel, markInvalid, num, renderRows, showErrors, hideErrors, str, usd } from "../lib/toolUi";
+
+    const form = document.getElementById("dp") as HTMLFormElement;
+    const res = document.getElementById("res") as HTMLElement;
+    const err = document.getElementById("err") as HTMLElement;
+    const note = document.getElementById("note") as HTMLElement;
+    const dur = (m: number) => {
+      const h = Math.floor(m / 60), r = m % 60;
+      return h === 0 ? `${r} min` : r === 0 ? `${h} h` : `${h} h ${r} min`;
+    };
+
+    const STOPS = [
+      { key: "pickup", name: "Pickup" },
+      { key: "delivery", name: "Delivery" },
+    ] as const;
+    const CORE_TO_INPUT: Record<string, string> = { arrival: "Arrival", departure: "Departure", extraDays: "Days" };
+
+    function run() {
+      const fd = new FormData(form);
+      const problems: { input: string; message: string }[] = [];
+      const used: { name: string; key: string; minutes: number }[] = [];
+
+      for (const s of STOPS) {
+        const arr = str(fd, `${s.key}Arrival`), dep = str(fd, `${s.key}Departure`);
+        if (arr === "" && dep === "") continue; // stop not used
+        if (arr === "" || dep === "") {
+          problems.push({ input: `${s.key}${arr === "" ? "Arrival" : "Departure"}`, message: "Enter both arrival and departure, or leave both blank to skip this stop." });
+          continue;
+        }
+        const t = minutesBetween(arr, dep, num(fd, `${s.key}Days`));
+        if (!t.ok) {
+          for (const e of t.errors) problems.push({ input: `${s.key}${CORE_TO_INPUT[e.field] ?? "Arrival"}`, message: e.message });
+          continue;
+        }
+        used.push({ name: s.name, key: s.key, minutes: t.value });
+      }
+      if (used.length === 0 && problems.length === 0) {
+        problems.push({ input: "pickupArrival", message: "Enter arrival and departure times for at least one stop." });
+      }
+
+      const r = problems.length > 0 ? null : calculateDetention({
+        stops: used.map((u) => ({ minutesOnSite: u.minutes })),
+        freeMinutes: num(fd, "freeMinutes"),
+        hourlyRate: num(fd, "hourlyRate"),
+        billingIncrement: num(fd, "billingIncrement") as BillingIncrement,
+        layoverDays: num(fd, "layoverDays"),
+        layoverRatePerDay: num(fd, "layoverRatePerDay"),
+      });
+      if (r && !r.ok) {
+        for (const e of r.errors) {
+          const m = /^stops\[(\d+)\]/.exec(e.field);
+          const stop = m ? used[Number(m[1])] : undefined;
+          problems.push({ input: stop ? `${stop.key}Days` : e.field, message: e.message });
+        }
+      }
+
+      clearInvalid(form);
+      res.replaceChildren();
+      note.hidden = true;
+
+      if (problems.length > 0 || !r || !r.ok) {
+        showErrors(err, problems.map((p) => {
+          markInvalid(form, p.input);
+          return `${fieldLabel(form, p.input)}: ${p.message}`;
+        }));
+        return;
+      }
+
+      hideErrors(err);
+      const v = r.value;
+      const rows: [string, string, boolean?][] = [];
+      v.stops.forEach((s, i) => {
+        const name = used[i]?.name ?? `Stop ${i + 1}`;
+        rows.push([`${name}: time on site`, dur(s.minutesOnSite)]);
+        rows.push([`${name}: billable time`, dur(s.billableMinutes)]);
+        rows.push([`${name}: detention pay`, usd(s.pay)]);
+      });
+      rows.push(["Total detention pay", usd(v.detentionPay), true]);
+      rows.push(["Layover pay", usd(v.layoverPay)]);
+      rows.push(["Total owed", usd(v.totalPay), true]);
+      renderRows(res, rows);
+      if (v.totalPay === 0) {
+        note.hidden = false;
+        note.textContent = "No detention pay: time on site stayed within the free time.";
+      }
+    }
+    bindForm(form, run);
+  </script>
+</Base>

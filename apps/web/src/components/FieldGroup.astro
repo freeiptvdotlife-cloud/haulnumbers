@@ -1,0 +1,12 @@
+---
+interface Props {
+  legend: string;
+  /** "fields": responsive grid of inputs. "block": plain container for custom layouts. */
+  layout?: "fields" | "block";
+}
+const { legend, layout = "fields" } = Astro.props;
+---
+<fieldset class={layout}>
+  <legend>{legend}</legend>
+  <slot />
+</fieldset>

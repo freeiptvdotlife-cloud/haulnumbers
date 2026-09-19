@@ -1,0 +1,44 @@
+/*
+ * Shared styles for the calculator pages. These are GLOBAL on purpose: result rows, table cells and
+ * IFTA rows are created by JavaScript, and Astro scopes a page's own <style> to elements its template
+ * rendered, so scoped rules never reach them.
+ */
+label { display:grid; gap:4px; font-size:14px; color:var(--muted); }
+input, select, button.add, button.rm { font:inherit; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--fg); min-height:44px; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline:3px solid var(--accent); outline-offset:1px; }
+[aria-invalid="true"] { border-color:var(--bad); }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.hint { color:var(--muted); font-size:14px; margin:12px 0 0; }
+
+fieldset.fields { border:0; padding:0; margin:0 0 16px; display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
+fieldset.block { border:0; padding:0; margin:0 0 16px; }
+fieldset legend { font-weight:700; margin-bottom:8px; padding:0; width:100%; }
+
+/* Results */
+.result { margin-top:16px; min-height:var(--result-min, 20rem); }
+.result dl { display:grid; grid-template-columns:1fr auto; gap:6px 16px; margin:0 0 12px; }
+.result dt { color:var(--muted); }
+.result dd { margin:0; font-weight:700; text-align:right; font-variant-numeric:tabular-nums; }
+.result dd.big { font-size:1.4em; color:var(--brand); }
+.err { color:var(--bad); }
+.banner, .note { margin:0 0 12px; padding:10px 12px; border-radius:8px; font-weight:600; }
+.banner { border:2px solid var(--accent); }
+.note { border:2px solid var(--line); }
+.verdict { font-weight:700; padding:10px 12px; border-radius:8px; border:2px solid var(--line); margin:0 0 12px; }
+.verdict[data-v="TAKE"] { border-color:var(--brand); }
+.verdict[data-v="NEGOTIATE"] { border-color:var(--accent); }
+.verdict[data-v="SKIP"] { border-color:var(--bad); }
+.source, .disclaimer { color:var(--muted); font-size:13px; margin:8px 0 0; }
+.tablewrap { overflow-x:auto; }
+.result table { border-collapse:collapse; width:100%; min-width:640px; font-variant-numeric:tabular-nums; }
+.result th, .result td { padding:6px 8px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap; }
+.result th:first-child, .result td:first-child { text-align:left; }
+.result thead th { color:var(--muted); font-size:13px; }
+.result td.total { font-weight:700; }
+.notes { color:var(--muted); font-size:14px; }
+
+/* FAQ and related tools */
+details { border-top:1px solid var(--line); padding:8px 0; }
+summary { cursor:pointer; font-weight:600; }
+.related { list-style:none; padding:0; display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
+.related p { margin:.3em 0 0; color:var(--muted); font-size:14px; }

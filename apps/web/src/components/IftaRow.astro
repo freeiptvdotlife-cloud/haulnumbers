@@ -1,0 +1,30 @@
+---
+import { IFTA_STATE_NAMES } from "@haulnumbers/core";
+
+interface Props {
+  code?: string;
+  miles?: string;
+  exempt?: string;
+  gallons?: string;
+}
+const { code = "", miles = "", exempt = "0", gallons = "" } = Astro.props;
+const states = Object.entries(IFTA_STATE_NAMES).sort((a, b) => a[1].localeCompare(b[1]));
+---
+<div class="ifta-row" data-row>
+  <label><span class="lab">State</span>
+    <select name="code" aria-label="State">
+      <option value="">Choose state</option>
+      {states.map(([c, n]) => <option value={c} selected={c === code}>{n}</option>)}
+    </select>
+  </label>
+  <label><span class="lab">Total miles</span>
+    <input name="miles" type="number" inputmode="numeric" min="0" step="1" placeholder="0" value={miles} aria-label="Total miles in this state" />
+  </label>
+  <label><span class="lab">Exempt miles</span>
+    <input name="exemptMiles" type="number" inputmode="numeric" min="0" step="1" placeholder="0" value={exempt} aria-label="Exempt miles in this state" />
+  </label>
+  <label><span class="lab">Gallons bought</span>
+    <input name="gallons" type="number" inputmode="decimal" min="0" step="any" placeholder="0" value={gallons} aria-label="Gallons bought in this state" />
+  </label>
+  <button type="button" class="rm" aria-label="Remove this state">×</button>
+</div>

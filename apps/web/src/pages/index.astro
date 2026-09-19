@@ -1,0 +1,21 @@
+---
+import Base from "../layouts/Base.astro";
+import { TOOLS } from "../data/tools";
+---
+<Base
+  title="Haul Numbers: Free Calculators for Owner-Operator Truckers"
+  description="Free trucking calculators for owner-operators: cost per mile, load profit with deadhead, detention pay, IFTA fuel tax, per diem, and more. Know your numbers before you take the load."
+  jsonLd={{ "@context": "https://schema.org", "@type": "WebSite", name: "Haul Numbers", url: "https://haulnumbers.com/" }}
+>
+  <h1>Know your numbers before you take the load</h1>
+  <p>Free, fast calculators built for owner-operators. No sign-up, and your figures never leave your device.</p>
+  <ul class="tools">
+    {TOOLS.map((t) => (
+      <li class="card">
+        <a href={t.path}><strong>{t.name}</strong></a>
+        <p>{t.blurb}</p>
+      </li>
+    ))}
+  </ul>
+  <style>.tools{list-style:none;padding:0;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))} .tools p{margin:.4em 0 0;color:var(--muted)} .soon{color:var(--muted)}</style>
+</Base>

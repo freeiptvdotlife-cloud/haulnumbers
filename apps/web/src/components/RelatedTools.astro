@@ -1,0 +1,18 @@
+---
+import { TOOLS } from "../data/tools";
+interface Props {
+  /** Path of the current page, which is left out of the list. */
+  current: string;
+}
+const { current } = Astro.props;
+const others = TOOLS.filter((t) => t.path !== current);
+---
+<h2>More trucking calculators</h2>
+<ul class="related">
+  {others.map((t) => (
+    <li class="card">
+      <a href={t.path}><strong>{t.name}</strong></a>
+      <p>{t.blurb}</p>
+    </li>
+  ))}
+</ul>

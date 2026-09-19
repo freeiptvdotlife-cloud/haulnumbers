@@ -1,0 +1,20 @@
+---
+/**
+ * The live results area. Scripts fill #err, #banner and whatever the page puts in the slot.
+ * `minHeight` reserves the space up front so results appearing never push the content below
+ * (or an ad slot) down, which would count as layout shift.
+ */
+interface Props {
+  title?: string;
+  minHeight?: string;
+}
+const { title = "Your results", minHeight = "22rem" } = Astro.props;
+---
+<section class="card result" aria-live="polite" aria-labelledby="res-h" style={`--result-min:${minHeight}`}>
+  <h2 id="res-h">{title}</h2>
+  <slot name="before" />
+  <p id="banner" class="banner" hidden></p>
+  <p id="err" class="err" hidden></p>
+  <slot />
+  <p class="disclaimer">Estimate only, not financial, tax or legal advice. Check your own figures and contracts before relying on it.</p>
+</section>

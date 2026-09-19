@@ -1,0 +1,12 @@
+{
+  "name": "haulnumbers",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "test": "npm run test -w @haulnumbers/core",
+    "typecheck": "npm run typecheck -w @haulnumbers/core && npm run check -w @haulnumbers/web",
+    "build:web": "npm run build -w @haulnumbers/web",
+    "dev:web": "npm run dev -w @haulnumbers/web"
+  }
+}

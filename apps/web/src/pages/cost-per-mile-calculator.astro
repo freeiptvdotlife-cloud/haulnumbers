@@ -1,0 +1,115 @@
+---
+import Base from "../layouts/Base.astro";
+import AdSlot from "../components/AdSlot.astro";
+import Field from "../components/Field.astro";
+import FieldGroup from "../components/FieldGroup.astro";
+import ResultPanel from "../components/ResultPanel.astro";
+import Faq from "../components/Faq.astro";
+import RelatedTools from "../components/RelatedTools.astro";
+import { toolJsonLd } from "../lib/seo";
+
+const PATH = "/cost-per-mile-calculator/";
+const faqs = [
+  { q: "What is cost per mile in trucking?", a: "Cost per mile (CPM) is your total operating cost divided by the miles you drove in the same period. It combines fixed costs (truck payment, insurance, permits) and variable costs (fuel, maintenance, tires)." },
+  { q: "What is a good cost per mile for an owner-operator?", a: "It depends on your equipment, fuel price and how many miles you run. What matters is that the rate you accept is above your own break-even cost per mile plus the profit you need." },
+  { q: "How do I calculate my break-even rate?", a: "Your break-even rate per mile equals your total cost per mile. Any load paying less than that loses money, before you even count deadhead miles." },
+  { q: "How is target profit margin calculated?", a: "Margin is a share of revenue, not a markup on cost. The target rate is cost per mile divided by (1 minus margin), so a 10% margin on $1.20 cost needs $1.333 per mile." },
+];
+---
+<Base
+  title="Trucking Cost Per Mile Calculator for Owner-Operators"
+  description="Free owner-operator cost per mile calculator. Enter fixed and variable costs to get your true CPM, break-even rate and the rate per mile you need for your target profit."
+  jsonLd={toolJsonLd({ name: "Trucking Cost Per Mile Calculator", path: PATH, faqs })}
+>
+  <h1>Trucking cost per mile calculator</h1>
+  <p>Enter your monthly figures to find your true cost per mile and the rate you need to charge.</p>
+
+  <form id="cpm" class="card" novalidate>
+    <FieldGroup legend="Miles">
+      <Field label="Miles driven this month" name="miles" inputmode="decimal" min="1" step="any" value="10000" />
+    </FieldGroup>
+    <FieldGroup legend="Fixed costs per month (USD)">
+      <Field label="Truck payment" name="truckPayment" inputmode="decimal" min="0" step="any" value="2000" />
+      <Field label="Insurance" name="insurance" inputmode="decimal" min="0" step="any" value="1500" />
+      <Field label="Permits and fees" name="permitsAndFees" inputmode="decimal" min="0" step="any" value="300" />
+      <Field label="Other fixed" name="other" inputmode="decimal" min="0" step="any" value="200" />
+    </FieldGroup>
+    <FieldGroup legend="Variable costs">
+      <Field label="Truck MPG" name="mpg" inputmode="decimal" min="0.1" step="any" value="6.5" />
+      <Field label="Fuel price per gallon" name="fuelPricePerGallon" inputmode="decimal" min="0" step="any" value="3.9" />
+      <Field label="Maintenance per mile" name="maintenancePerMile" inputmode="decimal" min="0" step="any" value="0.15" />
+      <Field label="Tires per mile" name="tiresPerMile" inputmode="decimal" min="0" step="any" value="0.05" />
+      <Field label="Other per mile" name="otherPerMile" inputmode="decimal" min="0" step="any" value="0" />
+      <Field label="Driver pay per mile" name="driverPayPerMile" inputmode="decimal" min="0" step="any" value="0" />
+    </FieldGroup>
+    <FieldGroup legend="Profit goal">
+      <Field label="Target profit margin (%)" name="marginPercent" inputmode="decimal" min="0" max="90" step="any" value="10" />
+    </FieldGroup>
+  </form>
+
+  <ResultPanel minHeight="18rem">
+    <dl id="res"></dl>
+  </ResultPanel>
+
+  <AdSlot slot={import.meta.env.PUBLIC_ADSENSE_SLOT_CPM} />
+
+  <section>
+    <h2>How the calculation works</h2>
+    <ol>
+      <li><strong>Fixed cost per mile</strong> = (truck payment + insurance + permits + other fixed) ÷ miles.</li>
+      <li><strong>Fuel per mile</strong> = fuel price ÷ MPG.</li>
+      <li><strong>Cost per mile</strong> = fixed per mile + fuel + maintenance + tires + other + driver pay.</li>
+      <li><strong>Break-even rate</strong> = cost per mile.</li>
+      <li><strong>Target rate</strong> = cost per mile ÷ (1 − margin).</li>
+    </ol>
+    <p>Once you know your cost per mile, check a specific load with the <a href="/load-profit-calculator/">load profit calculator</a>, which adds deadhead miles and fees.</p>
+    <Faq faqs={faqs} />
+    <RelatedTools current={PATH} />
+  </section>
+
+  <script>
+    import { calculateCostPerMile } from "@haulnumbers/core";
+    import { bindForm, clearInvalid, fieldLabel, markInvalid, num, renderRows, showErrors, hideErrors, usd } from "../lib/toolUi";
+
+    const form = document.getElementById("cpm") as HTMLFormElement;
+    const res = document.getElementById("res") as HTMLElement;
+    const err = document.getElementById("err") as HTMLElement;
+
+    // Core field path -> the input's name on this page.
+    const inputName = (field: string) =>
+      field === "targetProfitMargin" ? "marginPercent" : field.replace(/^(fixed|variable)\./, "");
+
+    function run() {
+      const fd = new FormData(form);
+      const r = calculateCostPerMile({
+        miles: num(fd, "miles"),
+        fixed: { truckPayment: num(fd, "truckPayment"), insurance: num(fd, "insurance"), permitsAndFees: num(fd, "permitsAndFees"), other: num(fd, "other") },
+        variable: { mpg: num(fd, "mpg"), fuelPricePerGallon: num(fd, "fuelPricePerGallon"), maintenancePerMile: num(fd, "maintenancePerMile"), tiresPerMile: num(fd, "tiresPerMile"), otherPerMile: num(fd, "otherPerMile") },
+        driverPayPerMile: num(fd, "driverPayPerMile"),
+        targetProfitMargin: num(fd, "marginPercent") / 100,
+      });
+      clearInvalid(form);
+      res.replaceChildren();
+      if (!r.ok) {
+        showErrors(err, r.errors.map((e) => {
+          const name = inputName(e.field);
+          markInvalid(form, name);
+          return `${fieldLabel(form, name)}: ${e.message}`;
+        }));
+        return;
+      }
+      hideErrors(err);
+      const v = r.value;
+      renderRows(res, [
+        ["Total cost per mile", usd(v.costPerMile, 3), true],
+        ["Break-even rate per mile", usd(v.breakEvenRatePerMile, 3)],
+        ["Target rate per mile", usd(v.targetRatePerMile, 3), true],
+        ["Fixed cost per mile", usd(v.fixedPerMile, 3)],
+        ["Fuel per mile", usd(v.fuelPerMile, 3)],
+        ["Total monthly cost", usd(v.totalCost)],
+        ["Profit at target rate", usd(v.targetProfit)],
+      ]);
+    }
+    bindForm(form, run);
+  </script>
+</Base>

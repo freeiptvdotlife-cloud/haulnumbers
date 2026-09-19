@@ -1,0 +1,255 @@
+---
+import Base from "../layouts/Base.astro";
+import AdSlot from "../components/AdSlot.astro";
+import Field from "../components/Field.astro";
+import SelectField from "../components/SelectField.astro";
+import FieldGroup from "../components/FieldGroup.astro";
+import ResultPanel from "../components/ResultPanel.astro";
+import Faq from "../components/Faq.astro";
+import RelatedTools from "../components/RelatedTools.astro";
+import IftaRow from "../components/IftaRow.astro";
+import { toolJsonLd } from "../lib/seo";
+import { IFTA_RATE_TABLES, listIftaQuarters } from "@haulnumbers/core";
+
+const PATH = "/ifta-calculator/";
+const quarters = listIftaQuarters().map((q) => {
+  const t = IFTA_RATE_TABLES.find((x) => x.quarter === q)!;
+  return { value: q, label: `${q.slice(0, 4)} Q${q.slice(5)}${t.status === "preliminary" ? " (preliminary)" : ""}` };
+});
+const newestFinal = IFTA_RATE_TABLES.filter((t) => t.status === "final").map((t) => t.quarter).sort().reverse()[0];
+const latestRetrieved = IFTA_RATE_TABLES.map((t) => t.retrievedAt).sort().reverse()[0];
+
+const faqs = [
+  { q: "What is an IFTA fuel tax return?", a: "IFTA (the International Fuel Tax Agreement) lets a carrier file one quarterly return with its base state instead of paying fuel tax to every state it drives through. The return works out the tax owed to each state from the miles driven there, and credits the tax already paid at the pump." },
+  { q: "Why do I owe tax in one state and get a credit in another?", a: "You owe a state tax on the fuel you burned there, estimated from your miles. You already paid tax on the fuel you bought there. If you burned more than you bought, you owe the difference. If you bought more than you burned, you get a credit. The credits and debts are then netted on one return." },
+  { q: "Do deadhead and non-revenue miles count?", a: "Yes. Total miles for your fleet MPG must include every mile driven, including empty (deadhead) miles, bobtail miles and off-highway miles. Miles you enter as exempt still count toward MPG but are removed from taxable miles." },
+  { q: "What are the Kentucky and Virginia surcharges?", a: "Kentucky and Virginia add a surcharge on top of the fuel tax. It is worked out on your taxable gallons, without deducting the fuel you bought there, so it is always owed and never becomes a credit." },
+  { q: "Which fuels and places does this cover?", a: "Diesel in the 48 IFTA member U.S. states. Gasoline, other fuels and Canadian provinces are not included, so this is not a complete return." },
+  { q: "Where do the rates come from?", a: "From the fuel tax matrix published by IFTA, Inc. Each quarter's rates are shown with the date we retrieved them, and quarters IFTA has not finalised are labelled preliminary. Always confirm against the official matrix before you file." },
+];
+---
+<Base
+  title="IFTA Fuel Tax Calculator with Current Quarterly Diesel Rates"
+  description="Free IFTA calculator for truckers. Enter miles and gallons by state to estimate your quarterly diesel fuel tax, with fleet MPG, credits and Kentucky and Virginia surcharges."
+  jsonLd={toolJsonLd({ name: "IFTA Fuel Tax Calculator", path: PATH, faqs })}
+>
+  <h1>IFTA fuel tax calculator</h1>
+  <p>Enter your miles and fuel purchases by state to estimate your quarterly IFTA diesel tax, using the official rates for the quarter you choose.</p>
+
+  <form id="ifta" class="card" novalidate>
+    <FieldGroup legend="Return details">
+      <SelectField label="Quarter" name="quarter" id="quarter" options={quarters} value={newestFinal} />
+      <Field label="Fuel bought without tax paid (gallons, optional)" name="untaxedGallons" inputmode="decimal" min="0" step="any" value="0" />
+    </FieldGroup>
+
+    <FieldGroup legend="Miles and fuel by state" layout="block">
+      <div class="ifta-head" aria-hidden="true"><span>State</span><span>Total miles</span><span>Exempt miles</span><span>Gallons bought</span><span></span></div>
+      <div id="rows">
+        <IftaRow code="TX" miles="6000" gallons="900" />
+        <IftaRow code="KY" miles="2000" gallons="100" />
+        <IftaRow code="CA" miles="2000" gallons="250" />
+      </div>
+      <button type="button" id="add" class="add">Add a state</button>
+      <p class="hint">Total miles means every mile in the state, including empty miles. Exempt miles are miles that state does not tax. Gallons bought means fuel bought in that state with its tax in the price. Miles and gallons are rounded to whole numbers, as on the IFTA return.</p>
+    </FieldGroup>
+  </form>
+
+  <template id="row-tpl"><IftaRow /></template>
+
+  <ResultPanel title="Your estimate" minHeight="30rem">
+    <dl id="summary"></dl>
+    <div class="tablewrap">
+      <table id="detail" hidden>
+        <caption class="sr-only">Tax by state</caption>
+        <thead><tr><th scope="col">State</th><th scope="col">Taxable miles</th><th scope="col">Taxable gallons</th><th scope="col">Gallons bought</th><th scope="col">Net gallons</th><th scope="col">Rate per gallon</th><th scope="col">Tax or credit</th><th scope="col">Surcharge</th><th scope="col">Total</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <ul id="notes" class="notes"></ul>
+    <p class="source">Rates: <a href="https://www.iftach.org/taxmatrix4/Taxmatrix.php">IFTA, Inc. fuel tax matrix</a>, retrieved {latestRetrieved}. Negative amounts are credits. Interest, penalties, other fuels and Canada are not included.</p>
+  </ResultPanel>
+
+  <AdSlot slot={import.meta.env.PUBLIC_ADSENSE_SLOT_IFTA} />
+
+  <section>
+    <h2>How the IFTA calculation works</h2>
+    <ol>
+      <li><strong>Fleet MPG</strong> = total miles in every state (including empty and exempt miles) ÷ total gallons used, rounded to two decimals.</li>
+      <li><strong>Taxable miles</strong> for each state = miles − exempt miles.</li>
+      <li><strong>Taxable gallons</strong> = taxable miles ÷ fleet MPG, rounded to a whole gallon.</li>
+      <li><strong>Net taxable gallons</strong> = taxable gallons − gallons you bought in that state (tax paid).</li>
+      <li><strong>Tax or credit</strong> = net taxable gallons × that state's diesel rate for the quarter. A negative result is a credit.</li>
+      <li><strong>Surcharge</strong> (Kentucky, Virginia) = taxable gallons × surcharge rate. It is not reduced by fuel you bought there, and it is never a credit.</li>
+      <li><strong>Net tax</strong> = the sum across states. A positive total is what you owe, and a negative total is a net credit.</li>
+    </ol>
+
+    <h2>Worked example</h2>
+    <p>In a quarter you drive 10,000 miles and buy 1,250 gallons, so your fleet MPG is 8.00. You drove 6,000 miles in Texas and bought 900 gallons there, 2,000 miles in Kentucky and bought 100 gallons, and 2,000 miles in California and bought 250 gallons.</p>
+    <ul>
+      <li><strong>Texas:</strong> 6,000 ÷ 8 = 750 taxable gallons, but you bought 900. Net −150 gallons × $0.20 = <strong>−$30.00 credit</strong>.</li>
+      <li><strong>Kentucky:</strong> 2,000 ÷ 8 = 250 taxable gallons. Net 250 − 100 = 150 gallons × $0.22 = $33.00, plus a surcharge of 250 × $0.105 = $26.25, so <strong>$59.25 due</strong>.</li>
+      <li><strong>California:</strong> 2,000 ÷ 8 = 250 taxable gallons, and you bought 250. Net 0, so <strong>$0.00</strong>.</li>
+    </ul>
+    <p>The credit in Texas offsets what you owe elsewhere: −$30.00 + $59.25 + $0.00 = <strong>$29.25 net due</strong>. These are the 2026 Q3 rates, and the example above is pre-filled in the calculator.</p>
+
+    <h2>What to count</h2>
+    <ul>
+      <li>Count <strong>every mile</strong> in every state, including deadhead, bobtail and off-highway miles, so your fleet MPG is right.</li>
+      <li>Count <strong>all fuel</strong> put in the tank when working out MPG. Fuel bought without tax in the price goes in the optional box above.</li>
+      <li>Enter a state's miles even when you bought no fuel there. Leave gallons blank or 0.</li>
+      <li>Oregon shows no diesel rate in IFTA, Inc.'s matrix, so it is estimated at $0.00. Still enter your Oregon miles so your fleet MPG stays correct.</li>
+    </ul>
+
+    <h2>Before you file</h2>
+    <p>Returns are generally due by the last day of the month after the quarter ends (April 30, July 31, October 31 and January 31), but confirm the date and your own requirements with your base jurisdiction. Rates can change every quarter, and a quarter marked preliminary is not final until the date IFTA, Inc. gives for it. This calculator estimates the tax and does not file your return. See also the <a href="/cost-per-mile-calculator/">cost per mile calculator</a>, where fuel tax is part of your real operating cost.</p>
+
+    <Faq faqs={faqs} />
+    <RelatedTools current={PATH} />
+  </section>
+
+  <style is:global>
+    .add, .rm { cursor:pointer; }
+    .add { margin-top:8px; }
+    .rm { width:44px; padding:0; font-size:20px; line-height:1; }
+    .ifta-row { display:grid; gap:10px; grid-template-columns:1fr 1fr; padding:12px 0; border-top:1px solid var(--line); align-items:end; }
+    .ifta-row label:first-child { grid-column:1 / -1; }
+    .ifta-head { display:none; }
+    @media (min-width:720px) {
+      .ifta-head, .ifta-row { grid-template-columns:2fr 1fr 1fr 1fr 44px; gap:10px; }
+      .ifta-head { display:grid; color:var(--muted); font-size:14px; padding-bottom:4px; }
+      .ifta-row { border-top:0; padding:4px 0; }
+      .ifta-row label:first-child { grid-column:auto; }
+      .ifta-row .lab { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+    }
+  </style>
+
+  <script>
+    import { IFTA_STATE_NAMES, calculateIfta, getIftaRateTable } from "@haulnumbers/core";
+    import { bindForm, clearInvalid, renderRows, showErrors, hideErrors, usd } from "../lib/toolUi";
+
+    const form = document.getElementById("ifta") as HTMLFormElement;
+    const rowsEl = document.getElementById("rows") as HTMLElement;
+    const tpl = document.getElementById("row-tpl") as HTMLTemplateElement;
+    const addBtn = document.getElementById("add") as HTMLButtonElement;
+    const quarterEl = document.getElementById("quarter") as HTMLSelectElement;
+    const untaxedEl = form.elements.namedItem("untaxedGallons") as HTMLInputElement;
+    const err = document.getElementById("err") as HTMLElement;
+    const banner = document.getElementById("banner") as HTMLElement;
+    const summary = document.getElementById("summary") as HTMLElement;
+    const table = document.getElementById("detail") as HTMLTableElement;
+    const tbody = table.querySelector("tbody") as HTMLElement;
+    const notes = document.getElementById("notes") as HTMLElement;
+    const MAX_ROWS = 48;
+
+    const int = (n: number) => n.toLocaleString("en-US");
+    const rate4 = (n: number) => n.toFixed(4);
+    const q = (row: Element, name: string) => row.querySelector(`[name="${name}"]`) as HTMLInputElement | HTMLSelectElement;
+    const rows = () => Array.from(rowsEl.querySelectorAll<HTMLElement>("[data-row]"));
+
+    // Miles must be entered (blank is an error). Exempt miles and gallons bought are naturally
+    // "none" when blank, so they default to 0 rather than blocking the estimate.
+    const numStrict = (v: string) => (v.trim() === "" ? Number.NaN : Number(v));
+    const numOr0 = (v: string) => (v.trim() === "" ? 0 : Number(v));
+
+    // Pick the current calendar quarter when we have its rates; otherwise keep the newest final one.
+    const now = new Date();
+    const current = `${now.getUTCFullYear()}Q${Math.floor(now.getUTCMonth() / 3) + 1}`;
+    if (Array.from(quarterEl.options).some((o) => o.value === current)) quarterEl.value = current;
+
+    function syncAddState() { addBtn.disabled = rows().length >= MAX_ROWS; }
+
+    function run() {
+      const used: { el: HTMLElement; index: number }[] = [];
+      const jurisdictions = rows().flatMap((el, index) => {
+        const code = q(el, "code").value, miles = q(el, "miles").value, ex = q(el, "exemptMiles").value, gal = q(el, "gallons").value;
+        if (code === "" && miles.trim() === "" && (ex.trim() === "" || ex === "0") && gal.trim() === "") return []; // empty row
+        used.push({ el, index });
+        return [{ code, miles: numStrict(miles), exemptMiles: numOr0(ex), taxPaidGallons: numOr0(gal) }];
+      });
+      const r = calculateIfta({ quarter: quarterEl.value, jurisdictions, untaxedGallons: numOr0(untaxedEl.value) });
+
+      clearInvalid(form);
+      summary.replaceChildren(); tbody.replaceChildren(); notes.replaceChildren();
+      banner.hidden = true; table.hidden = true;
+
+      if (!r.ok) {
+        const parts: string[] = [];
+        for (const e of r.errors) {
+          const m = /^jurisdictions\[(\d+)\]\.(\w+)$/.exec(e.field);
+          if (m) {
+            const u = used[Number(m[1])];
+            if (u) {
+              const state = IFTA_STATE_NAMES[q(u.el, "code").value];
+              parts.push(`Row ${u.index + 1}${state ? ` (${state})` : ""}: ${e.message}`);
+              q(u.el, m[2] === "taxPaidGallons" ? "gallons" : m[2] ?? "code").setAttribute("aria-invalid", "true");
+              continue;
+            }
+          }
+          if (e.field === "quarter") quarterEl.setAttribute("aria-invalid", "true");
+          if (e.field === "untaxedGallons") untaxedEl.setAttribute("aria-invalid", "true");
+          const prefix = e.field === "untaxedGallons" ? "Fuel bought without tax paid: " : e.field === "quarter" ? "Quarter: " : "";
+          parts.push(prefix + e.message);
+        }
+        showErrors(err, parts);
+        return;
+      }
+
+      hideErrors(err);
+      const v = r.value;
+      renderRows(summary, [
+        ["Fleet MPG", v.fleetMpg.toFixed(2)],
+        ["Total miles", int(v.totalMiles)],
+        ["Total gallons", int(v.totalGallons)],
+        [v.netTax < 0 ? "Net credit" : "Net tax due", usd(Math.abs(v.netTax)), true],
+      ]);
+
+      for (const j of v.jurisdictions) {
+        const tr = document.createElement("tr");
+        const cells = [
+          `${IFTA_STATE_NAMES[j.code] ?? j.code}`, int(j.taxableMiles), int(j.taxableGallons), int(j.taxPaidGallons),
+          int(j.netTaxableGallons), j.surchargeRate > 0 ? `${rate4(j.baseRate)} + ${rate4(j.surchargeRate)}` : rate4(j.baseRate),
+          usd(j.tax), j.surchargeRate > 0 ? usd(j.surcharge) : "—", usd(j.total),
+        ];
+        cells.forEach((text, i) => {
+          const td = document.createElement("td"); td.textContent = text;
+          if (i === cells.length - 1) td.className = "total";
+          tr.append(td);
+        });
+        tbody.append(tr);
+      }
+      table.hidden = false;
+
+      const rateTable = getIftaRateTable(v.quarter);
+      if (v.rateStatus === "preliminary") {
+        banner.hidden = false;
+        banner.textContent = `These ${v.quarter.slice(0, 4)} Q${v.quarter.slice(5)} rates are preliminary until ${v.rateFinalDate}. Check the official matrix again before filing.`;
+      }
+      const addNote = (t: string) => { const li = document.createElement("li"); li.textContent = t; notes.append(li); };
+      for (const w of v.warnings) addNote(w);
+      if (rateTable && v.jurisdictions.some((j) => rateTable.blankDiesel.includes(j.code))) {
+        addNote("IFTA, Inc. lists no diesel rate for Oregon, so it is estimated at $0.00. Its miles still count toward fleet MPG.");
+      }
+    }
+
+    function addRow() {
+      if (rows().length >= MAX_ROWS) return;
+      rowsEl.append(tpl.content.cloneNode(true));
+      syncAddState();
+      run();
+    }
+
+    addBtn.addEventListener("click", addRow);
+    rowsEl.addEventListener("click", (e) => {
+      const btn = (e.target as HTMLElement).closest(".rm");
+      if (!btn) return;
+      const row = btn.closest("[data-row]") as HTMLElement;
+      if (rows().length > 1) row.remove();
+      else { q(row, "code").value = ""; q(row, "miles").value = ""; q(row, "exemptMiles").value = "0"; q(row, "gallons").value = ""; }
+      syncAddState();
+      run();
+    });
+
+    syncAddState();
+    bindForm(form, run);
+  </script>
+</Base>

@@ -1,0 +1,10 @@
+{
+  "period": "2025-2026",
+  "effectiveFrom": "2025-10-01",
+  "effectiveThrough": "2026-09-30",
+  "notice": "Notice 2025-54",
+  "source": "IRS Notice 2025-54, section 3: special M&IE rates for the transportation industry",
+  "sourceUrl": "https://www.irs.gov/pub/irs-drop/n-25-54.pdf",
+  "retrievedAt": "2026-09-19",
+  "transportation": { "conus": 80, "oconus": 86 }
+}

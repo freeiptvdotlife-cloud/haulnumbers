@@ -1,0 +1,152 @@
+---
+import Base from "../layouts/Base.astro";
+import AdSlot from "../components/AdSlot.astro";
+import Field from "../components/Field.astro";
+import SelectField from "../components/SelectField.astro";
+import FieldGroup from "../components/FieldGroup.astro";
+import ResultPanel from "../components/ResultPanel.astro";
+import Faq from "../components/Faq.astro";
+import RelatedTools from "../components/RelatedTools.astro";
+import { toolJsonLd } from "../lib/seo";
+import { PER_DIEM_TABLES, listPerDiemPeriods } from "@haulnumbers/core";
+
+const PATH = "/per-diem-calculator/";
+const periods = listPerDiemPeriods().map((p) => {
+  const t = PER_DIEM_TABLES.find((x) => x.period === p)!;
+  return { value: p, label: `${t.effectiveFrom} to ${t.effectiveThrough} (${t.notice})` };
+});
+const latest = PER_DIEM_TABLES.find((t) => t.period === listPerDiemPeriods()[0])!;
+const areaOptions = [
+  { value: "conus", label: "Continental U.S." },
+  { value: "oconus", label: "Outside the continental U.S." },
+];
+const hosOptions = [
+  { value: "yes", label: "Yes, deduct 80%" },
+  { value: "no", label: "No, deduct 50%" },
+];
+
+const faqs = [
+  { q: "What is the trucker per diem?", a: "It is the IRS special meals and incidental expenses (M&IE) rate for the transportation industry. Instead of keeping every meal receipt, you deduct a flat amount for each day you are traveling away from home for work." },
+  { q: "Can company drivers deduct per diem?", a: "Generally not on their own tax return. IRS Publication 463 says the deduction for unreimbursed employee expenses is suspended for employees, apart from a few listed categories. This calculator is meant for self-employed owner-operators. Ask a tax professional about your own situation." },
+  { q: "Why is only 80% of the amount deductible?", a: "Meals are normally limited to 50%. Interstate truck operators who are subject to Department of Transportation hours-of-service limits deduct 80% for meals during those periods. If you are not subject to those limits, choose 50%." },
+  { q: "How are the first and last days of a trip counted?", a: "On the day you leave and the day you return you prorate the allowance. One IRS method is to claim three quarters of the daily rate for each of those days, and that is the method used here." },
+  { q: "Do I have to use the special rate on every trip?", a: "Yes. Publication 463 says that if you use the special transportation rate for any trip, you must use it for all trips you take that year, and not switch to the regular per diem rates." },
+  { q: "Does this calculator prove I qualify?", a: "No. It only does the arithmetic. Whether you can deduct meals depends on your tax home, whether you were away overnight for work, and how you file. Keep a log of your trip dates and purpose." },
+];
+---
+<Base
+  title="Trucker Per Diem Calculator with the IRS Special Rate"
+  description="Free per diem calculator for owner-operator truckers. Enter your days away from home to see the IRS special transportation rate, the 80% deduction and your estimated tax savings."
+  jsonLd={toolJsonLd({ name: "Trucker Per Diem Calculator", path: PATH, faqs })}
+>
+  <h1>Trucker per diem calculator</h1>
+  <p>Enter the days you were away from home to estimate your meal per diem deduction using the IRS special rate for transportation workers.</p>
+
+  <form id="pd" class="card" novalidate>
+    <FieldGroup legend="IRS rates">
+      <SelectField label="Rate period" name="period" options={periods} />
+      <SelectField label="Where you traveled" name="area" options={areaOptions} value="conus" />
+    </FieldGroup>
+    <FieldGroup legend="Days away from home">
+      <Field label="Full days away" name="fullDays" inputmode="numeric" min="0" max="366" step="1" value="10" />
+      <Field label="Departure and return days" name="partialDays" inputmode="numeric" min="0" max="366" step="1" value="2" />
+    </FieldGroup>
+    <FieldGroup legend="Deduction">
+      <SelectField label="Subject to DOT hours-of-service limits?" name="hos" options={hosOptions} value="yes" />
+      <Field label="Your combined tax rate (%), an example, enter your own" name="taxRate" inputmode="decimal" min="0" max="100" step="any" value="25" />
+    </FieldGroup>
+  </form>
+
+  <ResultPanel title="Your estimate" minHeight="22rem">
+    <dl id="res"></dl>
+    <p class="source">Rates: <a href={latest.sourceUrl}>IRS {latest.notice}</a>, retrieved {latest.retrievedAt}.</p>
+  </ResultPanel>
+
+  <AdSlot slot={import.meta.env.PUBLIC_ADSENSE_SLOT_PERDIEM} />
+
+  <section>
+    <h2>How the calculation works</h2>
+    <ol>
+      <li><strong>Daily rate</strong> = the IRS special M&amp;IE rate for the transportation industry: $80 in the continental U.S. and $86 outside it for the current period.</li>
+      <li><strong>Days counted</strong> = full days + ¾ of each departure and return day.</li>
+      <li><strong>Per diem total</strong> = days counted × daily rate.</li>
+      <li><strong>Deductible amount</strong> = per diem total × 80% (hours-of-service rules) or 50%.</li>
+      <li><strong>Estimated tax savings</strong> = deductible amount × your combined tax rate. Use a rate you have worked out yourself, and include self-employment tax if it applies to you.</li>
+    </ol>
+
+    <h2>Worked example</h2>
+    <p>You are away for 10 full days and also count 2 departure and return days. Those two days count as ¾ each, so you have 10 + 1.5 = 11.5 days. At $80 per day the per diem total is <strong>$920</strong>. As an interstate trucker subject to hours-of-service limits you deduct 80%, which is <strong>$736</strong>. At a 25% combined tax rate that lowers your tax by about <strong>$184</strong>. The same trip using the $86 rate outside the continental U.S. would total $989 and deduct $791.20.</p>
+
+    <h2>Who can use the special rate</h2>
+    <p>IRS Publication 463 describes the transportation industry as work that directly involves moving people or goods by airplane, barge, bus, ship, train or truck, and that regularly requires you to travel away from home. You are traveling away from home when your duties take you away from the general area of your tax home for substantially longer than an ordinary day's work and you need to sleep or rest to meet the demands of your work.</p>
+    <p>The special rate is a choice. If you use it for any trip in the year, you must use it for all trips that year and cannot switch to the regular per diem tables.</p>
+
+    <h2>Owner-operators and company drivers</h2>
+    <p>The deduction is normally claimed by self-employed people, such as owner-operators reporting business expenses on Schedule C. Publication 463 says employees who are not in a few listed categories cannot deduct unreimbursed employee expenses because miscellaneous itemized deductions are suspended. If you drive as an employee, your employer's pay and reimbursement rules matter more than this calculator, so ask a tax professional.</p>
+
+    <h2>Keeping records</h2>
+    <p>The standard meal allowance means you do not have to prove the amount of your meal costs. It is still sensible to keep a log of the dates you left and returned, where you went and why, since the days you claim must be days you were traveling away from home for work.</p>
+
+    <h2>When the rates change</h2>
+    <p>The IRS publishes new special per diem rates each year for the period that starts on October 1. This page shows the rate period you select and warns you when that period has ended. Check IRS.gov for the newest notice before you rely on the amounts.</p>
+
+    <Faq faqs={faqs} />
+    <RelatedTools current={PATH} />
+  </section>
+
+  <script>
+    import { calculatePerDiem, getPerDiemTable, type PerDiemArea } from "@haulnumbers/core";
+    import { bindForm, clearInvalid, fieldLabel, markInvalid, num, renderRows, showErrors, hideErrors, usd } from "../lib/toolUi";
+
+    const form = document.getElementById("pd") as HTMLFormElement;
+    const res = document.getElementById("res") as HTMLElement;
+    const err = document.getElementById("err") as HTMLElement;
+    const banner = document.getElementById("banner") as HTMLElement;
+    const INPUT_NAME: Record<string, string> = { subjectToHoursOfService: "hos", marginalTaxRatePercent: "taxRate" };
+
+    function run() {
+      const fd = new FormData(form);
+      const period = String(fd.get("period"));
+      const r = calculatePerDiem({
+        period,
+        area: String(fd.get("area")) as PerDiemArea,
+        fullDays: num(fd, "fullDays"),
+        partialDays: num(fd, "partialDays"),
+        subjectToHoursOfService: fd.get("hos") === "yes",
+        marginalTaxRatePercent: num(fd, "taxRate"),
+      });
+
+      clearInvalid(form);
+      res.replaceChildren();
+      banner.hidden = true;
+
+      const table = getPerDiemTable(period);
+      const today = new Date().toISOString().slice(0, 10);
+      if (table && today > table.effectiveThrough) {
+        banner.hidden = false;
+        banner.textContent = `These rates ended on ${table.effectiveThrough}. The IRS publishes new rates each year for the period starting October 1, so check IRS.gov for the current notice before relying on this estimate.`;
+      }
+
+      if (!r.ok) {
+        showErrors(err, r.errors.map((e) => {
+          const name = INPUT_NAME[e.field] ?? e.field;
+          markInvalid(form, name);
+          return `${fieldLabel(form, name)}: ${e.message}`;
+        }));
+        return;
+      }
+
+      hideErrors(err);
+      const v = r.value;
+      renderRows(res, [
+        ["Daily rate", usd(v.dailyRate)],
+        ["Departure and return day rate (¾)", usd(v.partialDayRate)],
+        ["Days counted", String(v.dayEquivalents)],
+        ["Per diem total", usd(v.perDiemTotal)],
+        [`Deductible (${v.deductiblePercent}%)`, usd(v.deductibleAmount), true],
+        [`Estimated tax savings at ${v.marginalTaxRatePercent}%`, usd(v.estimatedTaxSavings), true],
+      ]);
+    }
+    bindForm(form, run);
+  </script>
+</Base>

@@ -1,0 +1,166 @@
+---
+import Base from "../layouts/Base.astro";
+import AdSlot from "../components/AdSlot.astro";
+import Field from "../components/Field.astro";
+import FieldGroup from "../components/FieldGroup.astro";
+import ResultPanel from "../components/ResultPanel.astro";
+import Faq from "../components/Faq.astro";
+import RelatedTools from "../components/RelatedTools.astro";
+import { toolJsonLd } from "../lib/seo";
+
+const PATH = "/load-profit-calculator/";
+const faqs = [
+  { q: "How do I know if a load is worth taking?", a: "Compare the load's all-in rate per mile (total pay divided by loaded plus empty miles) with your own cost per mile plus the profit you need. If net profit per mile is below your minimum, counter-offer or skip." },
+  { q: "What are deadhead miles?", a: "Deadhead miles are the empty miles you drive to reach the pickup, or to return after delivery, with no freight on. You pay fuel and wear on them but usually get no revenue, so they lower your true rate per mile." },
+  { q: "Why is the rate per mile on the rate confirmation higher than my real rate?", a: "Brokers usually quote the rate per loaded mile. Your real rate is spread over every mile you drive, including deadhead, so it is always lower whenever you run empty." },
+  { q: "How are broker, dispatch and factoring fees applied?", a: "They are a percentage of the gross pay, so they grow with the rate. The calculator subtracts them from revenue, and when it works out the rate you should ask for, it accounts for the fact that a higher rate also means higher fees." },
+  { q: "What should I enter for non-fuel cost per mile?", a: "Use maintenance, tires and your share of fixed costs (truck payment, insurance, permits) per mile. The cost per mile calculator gives you the fixed share; subtract the fuel part to avoid counting fuel twice." },
+];
+---
+<Base
+  title="Trucking Load Profit Calculator with Deadhead Miles"
+  description="Free load profit calculator for owner-operators. Enter the rate, miles, deadhead, fuel and fees to see your real profit per mile and the lowest rate worth accepting."
+  jsonLd={toolJsonLd({ name: "Trucking Load Profit Calculator", path: PATH, faqs })}
+>
+  <h1>Trucking load profit calculator</h1>
+  <p>Enter the load details to see your real profit per mile, including deadhead, and the lowest pay you should accept.</p>
+
+  <form id="lp" class="card" novalidate>
+    <FieldGroup legend="Pay (USD)">
+      <Field label="Linehaul rate" name="linehaulRevenue" inputmode="decimal" min="0" step="any" value="2000" />
+      <Field label="Fuel surcharge" name="fuelSurcharge" inputmode="decimal" min="0" step="any" value="300" />
+      <Field label="Accessorials (detention, lumper)" name="accessorials" inputmode="decimal" min="0" step="any" value="100" />
+    </FieldGroup>
+    <FieldGroup legend="Miles">
+      <Field label="Loaded miles" name="loadedMiles" inputmode="decimal" min="1" step="any" value="800" />
+      <Field label="Deadhead (empty) miles" name="deadheadMiles" inputmode="decimal" min="0" step="any" value="200" />
+    </FieldGroup>
+    <FieldGroup legend="Costs">
+      <Field label="Truck MPG" name="mpg" inputmode="decimal" min="0.1" step="any" value="6.5" />
+      <Field label="Fuel price per gallon" name="fuelPricePerGallon" inputmode="decimal" min="0" step="any" value="4" />
+      <Field label="Tolls" name="tolls" inputmode="decimal" min="0" step="any" value="50" />
+      <Field label="Other trip costs" name="otherTripCosts" inputmode="decimal" min="0" step="any" value="0" />
+      <Field label="Non-fuel cost per mile" name="nonFuelCostPerMile" inputmode="decimal" min="0" step="any" value="0.3" />
+    </FieldGroup>
+    <FieldGroup legend="Fees and goal">
+      <Field label="Dispatch or broker fee (%)" name="dispatchPercent" inputmode="decimal" min="0" max="99" step="any" value="5" />
+      <Field label="Factoring fee (%)" name="factoringPercent" inputmode="decimal" min="0" max="99" step="any" value="2" />
+      <Field label="Minimum profit per mile" name="minProfitPerMile" inputmode="decimal" min="0" step="any" value="0.5" />
+    </FieldGroup>
+  </form>
+
+  <ResultPanel minHeight="28rem">
+    <p slot="before" id="verdict" class="verdict" hidden></p>
+    <dl id="res"></dl>
+  </ResultPanel>
+
+  <AdSlot slot={import.meta.env.PUBLIC_ADSENSE_SLOT_LOAD} />
+
+  <section>
+    <h2>How the calculation works</h2>
+    <ol>
+      <li><strong>Gross pay</strong> = linehaul + fuel surcharge + accessorials.</li>
+      <li><strong>Total miles</strong> = loaded miles + deadhead miles.</li>
+      <li><strong>Fuel cost</strong> = total miles ÷ MPG × fuel price.</li>
+      <li><strong>Other costs</strong> = total miles × non-fuel cost per mile + tolls + other trip costs.</li>
+      <li><strong>Fees</strong> = gross pay × (dispatch % + factoring %).</li>
+      <li><strong>Net profit</strong> = gross pay − fees − fuel − other costs.</li>
+      <li><strong>Minimum pay to accept</strong> = (fuel + other costs + minimum profit × total miles) ÷ (1 − fee %). Fees are a share of pay, so the pay you need is higher than the costs alone.</li>
+    </ol>
+
+    <h2>Worked example</h2>
+    <p>A load pays $2,000 linehaul, $300 fuel surcharge and $100 accessorials: <strong>$2,400</strong> gross. You run 800 loaded miles and 200 empty miles to reach the pickup, so 1,000 total miles, and 20% of them are deadhead. At 6.5 MPG and $4.00 per gallon, fuel costs about $615.38. Non-fuel costs of $0.30 per mile plus $50 tolls add $350. Fees of 5% dispatch and 2% factoring take $168.</p>
+    <p>Net profit is $2,400 − $168 − $615.38 − $350 = <strong>$1,266.62</strong>, or about $1.267 per mile across all 1,000 miles. That beats a $0.50 per mile minimum, so the calculator says <em>take it</em>. The lowest pay that still meets the minimum is about $1,575.69, which means you could counter as low as roughly $1,175.69 in linehaul with the same surcharge and accessorials.</p>
+
+    <h2>Why deadhead changes the answer</h2>
+    <p>The same $2,400 over 800 loaded miles looks like $3.00 per mile. Over all 1,000 miles it is $2.40 per mile, and that difference is real money you do not see on the rate confirmation. Run the calculation with your true deadhead every time, and compare loads by net profit per total mile, not by the posted rate per loaded mile.</p>
+    <p>Two loads with the same headline rate can differ a lot once you count where the truck ends up. A load that delivers somewhere you will likely sit or run empty to find the next one carries hidden deadhead. If you can, enter the empty miles you expect to run afterwards as part of the deadhead figure.</p>
+
+    <h2>Using the result</h2>
+    <ul>
+      <li><strong>Take:</strong> net profit per total mile meets your minimum.</li>
+      <li><strong>Negotiate:</strong> the load is profitable but under your minimum. Ask for at least the linehaul shown.</li>
+      <li><strong>Skip:</strong> the load loses money or breaks even before your own time and risk.</li>
+    </ul>
+    <p>These figures are estimates that depend on the numbers you enter. Real fuel prices, tolls and fees vary by trip, so check your rate confirmation. See also the <a href="/cost-per-mile-calculator/">cost per mile calculator</a> to find your non-fuel cost per mile, and the <a href="/detention-pay-calculator/">detention pay calculator</a> for the amount to enter under accessorials.</p>
+
+    <Faq faqs={faqs} />
+    <RelatedTools current={PATH} />
+  </section>
+
+  <script>
+    import { calculateLoadProfit } from "@haulnumbers/core";
+    import { bindForm, clearInvalid, fieldLabel, markInvalid, num, renderRows, showErrors, hideErrors, usd } from "../lib/toolUi";
+
+    const form = document.getElementById("lp") as HTMLFormElement;
+    const res = document.getElementById("res") as HTMLElement;
+    const err = document.getElementById("err") as HTMLElement;
+    const verdictEl = document.getElementById("verdict") as HTMLElement;
+    const pct = (n: number) => (n * 100).toLocaleString("en-US", { maximumFractionDigits: 1 }) + "%";
+
+    // Percent inputs map to fraction fields in core; errors should name the field the user sees.
+    const inputName = (field: string) =>
+      field === "dispatchFeePct" ? "dispatchPercent" : field === "factoringFeePct" ? "factoringPercent" : field;
+
+    function run() {
+      const fd = new FormData(form);
+      const r = calculateLoadProfit({
+        linehaulRevenue: num(fd, "linehaulRevenue"),
+        fuelSurcharge: num(fd, "fuelSurcharge"),
+        accessorials: num(fd, "accessorials"),
+        loadedMiles: num(fd, "loadedMiles"),
+        deadheadMiles: num(fd, "deadheadMiles"),
+        mpg: num(fd, "mpg"),
+        fuelPricePerGallon: num(fd, "fuelPricePerGallon"),
+        tolls: num(fd, "tolls"),
+        otherTripCosts: num(fd, "otherTripCosts"),
+        nonFuelCostPerMile: num(fd, "nonFuelCostPerMile"),
+        dispatchFeePct: num(fd, "dispatchPercent") / 100,
+        factoringFeePct: num(fd, "factoringPercent") / 100,
+        minProfitPerMile: num(fd, "minProfitPerMile"),
+      });
+
+      clearInvalid(form);
+      res.replaceChildren();
+
+      if (!r.ok) {
+        verdictEl.hidden = true;
+        showErrors(err, r.errors.map((e) => {
+          const name = inputName(e.field);
+          markInvalid(form, name);
+          return `${fieldLabel(form, name)}: ${e.message}`;
+        }));
+        return;
+      }
+
+      hideErrors(err);
+      const v = r.value;
+      const message =
+        v.verdict === "TAKE"
+          ? `Take it: you keep ${usd(v.profitPerMile, 3)} per mile, above your minimum.`
+          : v.verdict === "NEGOTIATE"
+            ? `Negotiate: profitable, but below your minimum. Ask for at least ${usd(v.minLinehaulToAccept)} linehaul.`
+            : v.netProfit < 0
+              ? `Skip: this load loses ${usd(-v.netProfit)}.`
+              : "Skip: this load only breaks even.";
+      verdictEl.hidden = false;
+      verdictEl.dataset.v = v.verdict;
+      verdictEl.textContent = message;
+
+      renderRows(res, [
+        ["Net profit", usd(v.netProfit), true],
+        ["Profit per total mile", usd(v.profitPerMile, 3), true],
+        ["All-in rate per mile (with deadhead)", usd(v.allInRatePerMile, 3)],
+        ["Deadhead share of miles", pct(v.deadheadPct)],
+        ["Gross pay", usd(v.grossRevenue)],
+        ["Fees", usd(v.fees)],
+        ["Fuel cost", usd(v.fuelCost)],
+        ["Other costs", usd(v.otherCost)],
+        ["Lowest pay to accept", usd(v.minRateToAccept)],
+        ["Lowest pay per mile to accept", usd(v.minRatePerMile, 3)],
+        ["Lowest linehaul to ask for", usd(v.minLinehaulToAccept)],
+      ]);
+    }
+    bindForm(form, run);
+  </script>
+</Base>
