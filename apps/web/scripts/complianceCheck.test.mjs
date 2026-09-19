@@ -101,4 +101,25 @@ test("robots.txt must not block the site or Google's ad crawler", () => {
   assert.ok(has(run({ robots: "User-agent: Mediapartners-Google\nDisallow: /\n" }), "robots"));
 });
 
+const PREVIEW = `<aside><p>Advertisement</p><div data-ads-preview>placeholder</div></aside>`;
+const previewPages = Object.fromEntries(AD_PAGES.map((p) => [p, `<main><h1>${p}</h1><p>${words(400)}</p>${PREVIEW}</main>${FOOTER}`]));
+
+test("an ad PREVIEW placeholder blocks a deploy check but is tolerated for local review", () => {
+  assert.ok(has(run({ pages: previewPages }, {}), "preview"));
+  assert.ok(has(run({ pages: previewPages }, MONETISED), "preview"));
+  assert.deepEqual(run({ pages: previewPages }, { ALLOW_PREVIEW: "1" }), []);
+});
+
+test("a preview placeholder still may not appear on a non-content page, even when previews are allowed", () => {
+  const bad = { privacy: `<main>${PRIVACY}${PREVIEW}</main>${FOOTER}` };
+  assert.ok(has(run({ pages: bad }, { ALLOW_PREVIEW: "1" }), "ad-placement"));
+});
+
+test("a preview placeholder still needs the Advertisement label and real content", () => {
+  const noLabel = { "ifta-calculator": `<main><p>${words(400)}</p><div data-ads-preview></div></main>${FOOTER}` };
+  assert.ok(has(run({ pages: noLabel }, { ALLOW_PREVIEW: "1" }), "ad-label"));
+  const thin = { "ifta-calculator": `<main><p>${words(20)}</p>${PREVIEW}</main>${words(400)}${FOOTER}` };
+  assert.ok(has(run({ pages: thin }, { ALLOW_PREVIEW: "1" }), "thin-content"));
+});
+
 test("reports a missing dist folder clearly", () => assert.match(checkDist(join(tmpdir(), "no-such-dist"))[0], /Run the build first/));

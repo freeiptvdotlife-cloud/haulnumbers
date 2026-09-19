@@ -84,3 +84,7 @@ Run after any change to layout, CSS or a page. Lighthouse and puppeteer are not 
 - Native build: from `apps/mobile`, `npx expo prebuild --platform android --no-install --clean`, then `cd android && ./gradlew assembleDebug`. Read the target SDK from the APK with `aapt2 dump badging app-debug.apk | grep targetSdkVersion` (build-tools 36 is installed). `android/`, `ios/`, `.expo/` and `dist-android/` are generated and git-ignored.
 - **Network note (this dev machine):** IPv6 to the npm registry fails, which made installs crawl. Use `NODE_OPTIONS=--dns-result-order=ipv4first` for npm and `JAVA_TOOL_OPTIONS=-Djava.net.preferIPv4Stack=true` for Gradle.
 - Still needed before release: run on a real device or emulator (consent form, test ads, TalkBack), and screenshots for the store listing.
+
+## Ad preview builds (web) and test-ad builds (app)
+- `PUBLIC_ADS_PREVIEW=1` swaps each ad slot for a dashed placeholder. Only for reviewing layout; the compliance gate rejects it unless `--allow-preview` is passed. Do not deploy such a build.
+- App: `ADMOB_USE_TEST_IDS=true` for internal/closed testing builds; `APP_ENV=production` plus real ids for release (the config throws otherwise).

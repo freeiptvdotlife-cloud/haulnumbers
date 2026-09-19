@@ -55,11 +55,15 @@ export function checkDist(dist, env = {}) {
 
   // 2. Ads only on content pages, labelled, and with enough real content.
   for (const [key, html] of pages) {
-    const hasAd = /<ins[^>]*class="adsbygoogle"/.test(html);
+    const hasRealAd = /<ins[^>]*class="adsbygoogle"/.test(html);
+    const hasPreview = html.includes("data-ads-preview");
+    const hasAd = hasRealAd || hasPreview;
     const hasLoader = html.includes("pagead2.googlesyndication.com");
+    // A preview placeholder is never deployable. It is only tolerated when explicitly allowed (local layout review).
+    if (hasPreview && !env.ALLOW_PREVIEW) fail("preview", `/${key === "/" ? "" : key + "/"} contains the ad PREVIEW placeholder: this build must not be deployed (use --allow-preview only for local review)`);
     // The loader may only be on ad pages: elsewhere it would let Auto ads reach non-content pages.
     if (hasLoader && !AD_PAGES.includes(key)) fail("ad-placement", `/${key === "/" ? "" : key + "/"} loads the AdSense script but is not a content page`);
-    if (hasAd && !hasLoader) fail("ads-config", `/${key}/ has an ad unit but does not load the AdSense script`);
+    if (hasRealAd && !hasLoader) fail("ads-config", `/${key}/ has an ad unit but does not load the AdSense script`);
     if (!hasAd) continue;
     if (!AD_PAGES.includes(key)) { fail("ad-placement", `/${key}/ carries ads but is not a content page (ads are not allowed on non-content pages)`); continue; }
     if (!/>\s*Advertisement\s*</.test(html)) fail("ad-label", `/${key}/ has an ad without a visible "Advertisement" label`);

@@ -1,11 +1,14 @@
 import type { ExpoConfig } from "expo/config";
+import { SAMPLE_ADMOB_APP_ID, productionAdProblems } from "./src/config/releaseGuard.ts";
 
 /**
- * Google's published SAMPLE AdMob app id: safe for development and never earns anything.
- * A release build must set ADMOB_ANDROID_APP_ID to the real id, and the unit ids below.
- * (Ids are public identifiers, not secrets, but they differ per environment, so they come from env.)
+ * Ads configuration by build kind (ids are public identifiers, not secrets, but differ per environment):
+ *  - development: Google's TEST ids, sample app id (never earns anything).
+ *  - testing on Google Play (internal/closed): a real build with ADMOB_USE_TEST_IDS=true, so it shows test ads.
+ *  - production (APP_ENV=production): real ids REQUIRED; test ids or the sample app id make this file throw.
  */
-const SAMPLE_ADMOB_APP_ID = "ca-app-pub-3940256099942544~3347511713";
+const adProblems = productionAdProblems(process.env);
+if (adProblems.length > 0) throw new Error("Production ad configuration is invalid:\n - " + adProblems.join("\n - "));
 
 const config: ExpoConfig = {
   name: "Haul Numbers",
@@ -37,6 +40,7 @@ const config: ExpoConfig = {
     admob: {
       bannerUnitId: process.env.ADMOB_ANDROID_BANNER_UNIT_ID ?? "",
       interstitialUnitId: process.env.ADMOB_ANDROID_INTERSTITIAL_UNIT_ID ?? "",
+      useTestIds: process.env.ADMOB_USE_TEST_IDS === "true",
     },
   },
 };

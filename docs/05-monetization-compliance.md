@@ -49,6 +49,13 @@ Sources: [AdSense ad placement policies](https://support.google.com/adsense/answ
 
 Play data-safety inputs (complete in Phase 3.6): permissions requested by our config are `INTERNET` only; the AdMob SDK merges `ACCESS_NETWORK_STATE` and `com.google.android.gms.permission.AD_ID` (confirm in the built APK's manifest with `aapt2 dump permissions`).
 
+### Testing before real ads exist
+**AdMob (app) has real test ids; AdSense (web) has none.**
+- App: development builds always use Google's test ids and sample app id. A real Play build for internal or closed testing can show Google's test ads by building with `ADMOB_USE_TEST_IDS=true`. A **production** build (`APP_ENV=production`) must have your real AdMob app id and both unit ids, and `app.config.ts` throws if it is given the test flag, missing ids, malformed ids, or any of Google's test ids (`src/config/releaseGuard.ts`, tested).
+- Web: AdSense serves nothing without an approved account and real ids. Its test attribute only marks impressions as not counted; it does not make ads appear (and its exact name was not confirmed, so it is not wired in). Instead, `PUBLIC_ADS_PREVIEW=1` renders a clearly marked dashed placeholder in each ad slot so placement and layout can be reviewed now. The compliance gate **fails** any build containing the placeholder unless run with `--allow-preview`, so a preview build can never pass a deploy check.
+  - Review build: `PUBLIC_ADS_PREVIEW=1 npx astro build --outDir /tmp/preview` then `node scripts/check-compliance.mjs /tmp/preview --allow-preview`.
+- A free `*.pages.dev` address is technically allowed to apply, but approval on free subdomains is reported to be much less likely than on your own domain (secondary sources; Google's own page was not conclusive). Plan to apply with the real domain.
+
 ### Not yet verified (do not treat as confirmed)
 - `https://business.safety.google/privacy/` (Google Business Data Responsibility page) is linked from the privacy policy because Google's EU consent policy asks for it, but the URL could not be fetched from this environment. Open it once and confirm before launch.
 - Exact UMP SDK behaviour and the current `react-native-google-mobile-ads` consent API: read their docs when Phase 3.4 starts.

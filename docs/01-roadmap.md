@@ -38,6 +38,15 @@ Each phase has **deliverables** and **exit criteria**. Do not start monetization
 
 **Exit:** site live and indexed, AdSense approved, ads render without CLS regressions, consent works.
 
+## What can proceed without the domain
+| Can do now | Needs the domain, or an approved account |
+|---|---|
+| Finish the Android app: saved scenarios, tablet layout, native build, emulator/device run with test ads, store listing text and screenshots | AdSense application and `ads.txt` verification |
+| Guides and per-tool content (Phase 1.6, Phase 4.3): the main lever for AdSense approval | Real contact email (`PUBLIC_CONTACT_EMAIL`), then the compliance gate for a monetised build |
+| Per diem rate update when the IRS publishes the 2026-2027 notice (due about Oct 1) | Search Console property and sitemap submission |
+| Staging deploy to a free `*.pages.dev` address (add `noindex`); useful for a public privacy-policy URL during Play testing | `app-ads.txt` on the developer website named in the Play listing; final privacy-policy URL for the production listing |
+| Screen-reader pass, GitHub repository and CI, keyword research | Google-certified CMP message (configured inside the AdSense account) |
+
 ## Phase 3 · Android app + AdMob
 | # | Task | Size |
 |---|---|---|

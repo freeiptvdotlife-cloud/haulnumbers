@@ -7,6 +7,11 @@
  * on pages that actually contain a slot, and never on privacy/about/contact/terms (so Auto ads,
  * if ever switched on in the AdSense console, cannot place ads on those pages).
  *
+ * PREVIEW MODE: with PUBLIC_ADS_PREVIEW=1 (and no real ad configured) a clearly marked placeholder box is
+ * rendered instead, so placement and layout can be reviewed before AdSense approval. AdSense has no test
+ * ad ids: nothing renders without an approved account. The compliance gate FAILS any build containing the
+ * placeholder unless it is run with --allow-preview, so a preview build cannot be deployed by accident.
+ *
  * Env values must be read in frontmatter: `import.meta.env.X` written inside a page's template
  * expression is not replaced at build time, which would silently render no ads.
  *
@@ -33,6 +38,7 @@ const slots: Record<AdPage, string | undefined> = {
 const client = import.meta.env.PUBLIC_ADSENSE_CLIENT;
 const slot = slots[page];
 const enabled = Boolean(client && slot);
+const preview = !enabled && import.meta.env.PUBLIC_ADS_PREVIEW === "1";
 ---
 {enabled && (
   <aside class="ad" style={`min-height:calc(${minHeight}px + 20px)`} aria-label="Advertisement">
@@ -40,5 +46,11 @@ const enabled = Boolean(client && slot);
     <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`} crossorigin="anonymous"></script>
     <ins class="adsbygoogle" style="display:block" data-ad-client={client} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true"></ins>
     <script is:inline>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </aside>
+)}
+{preview && (
+  <aside class="ad" data-ads-preview style={`min-height:calc(${minHeight}px + 20px)`} aria-label="Advertisement">
+    <p class="ad-label">Advertisement</p>
+    <div class="ad-preview" style={`height:${minHeight}px`}>Ad preview placeholder. Not a real ad; never deploy this build.</div>
   </aside>
 )}

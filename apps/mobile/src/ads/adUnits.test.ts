@@ -1,5 +1,5 @@
 /** Ad unit ids: dev builds must use Google's test ids; release builds must never fall back to them. */
-type Extra = { admob?: { bannerUnitId?: string; interstitialUnitId?: string } } | undefined;
+type Extra = { admob?: { bannerUnitId?: string; interstitialUnitId?: string; useTestIds?: boolean } } | undefined;
 
 function load(dev: boolean, extra: Extra) {
   const g = globalThis as unknown as { __DEV__: boolean };
@@ -25,6 +25,19 @@ describe("ad unit ids", () => {
     const { mod, restore } = load(false, { admob: { bannerUnitId: "ca-app-pub-1/real", interstitialUnitId: "ca-app-pub-1/real2" } });
     expect(mod.bannerUnitId()).toBe("ca-app-pub-1/real");
     expect(mod.interstitialUnitId()).toBe("ca-app-pub-1/real2");
+    restore();
+  });
+
+  it("a release-style testing build with useTestIds shows Google's test ads, ignoring any real ids", () => {
+    const { mod, restore } = load(false, { admob: { useTestIds: true, bannerUnitId: "ca-app-pub-1/real", interstitialUnitId: "ca-app-pub-1/real2" } });
+    expect(mod.bannerUnitId()).toBe("test-banner");
+    expect(mod.interstitialUnitId()).toBe("test-interstitial");
+    restore();
+  });
+
+  it("useTestIds must be exactly true: other values do not enable it", () => {
+    const { mod, restore } = load(false, { admob: { useTestIds: "true" as unknown as boolean } });
+    expect(mod.bannerUnitId()).toBe("");
     restore();
   });
 

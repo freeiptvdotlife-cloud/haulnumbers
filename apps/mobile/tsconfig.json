@@ -5,7 +5,8 @@
     "noUncheckedIndexedAccess": true,
     "types": [
       "jest"
-    ]
+    ],
+    "allowImportingTsExtensions": true
   },
   "include": [
     "**/*.ts",
