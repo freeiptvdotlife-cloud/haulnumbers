@@ -1,0 +1,32 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { SITE_URL } from "../../data/site";
+
+const posts = (await getCollection("news")).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Trucking digest for owner-operators",
+  itemListElement: posts.map((p, i) => ({ "@type": "ListItem", position: i + 1, name: p.data.title, url: `${SITE_URL}/news/${p.id}/` })),
+};
+---
+<Base
+  title="Trucking Digest for Owner-Operators"
+  description="A short daily digest of the trucking news that changes an owner-operator's numbers: fuel, rates, rules and taxes, with links to the original reporting."
+  jsonLd={jsonLd}
+  noindex={posts.length === 0}
+>
+  <h1>Trucking digest</h1>
+  <p>One short read a day on the news that changes an owner-operator's numbers. Each digest pulls several trade reports together, says what they mean for a small carrier, and links every original so you can read the full story.</p>
+  {posts.length === 0 ? <p>The first digest is on its way.</p> : (
+    <ul class="related">
+      {posts.map((p) => (
+        <li class="card">
+          <a href={`/news/${p.id}/`}><strong>{p.data.title}</strong></a>
+          <p><time datetime={p.data.date.toISOString().slice(0, 10)}>{p.data.date.toISOString().slice(0, 10)}</time> · {p.data.description}</p>
+        </li>
+      ))}
+    </ul>
+  )}
+</Base>

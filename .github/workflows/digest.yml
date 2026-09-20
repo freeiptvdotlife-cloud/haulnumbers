@@ -1,0 +1,43 @@
+name: Daily digest
+
+# Drafts one trucking digest a day with Cloudflare Workers AI and opens a pull request.
+# Merging the PR is the editorial review and publishes the post (the site deploys on merge).
+on:
+  schedule:
+    - cron: "17 11 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Draft the digest
+        working-directory: apps/web
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: node scripts/digest/run.mjs
+      - name: Open a pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$(git status --porcelain apps/web/src/content/news apps/web/scripts/digest/state.json)" ]; then
+            echo "No post today."; exit 0
+          fi
+          branch="digest/$(date -u +%F)"
+          git config user.name "haulnumbers-digest-bot"
+          git config user.email "digest-bot@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add apps/web/src/content/news apps/web/scripts/digest/state.json
+          git commit -m "Add digest for $(date -u +%F)"
+          git push origin "$branch"
+          gh pr create --title "Digest $(date -u +%F)" --body "AI-drafted digest. Before merging: read it, check each claim against the linked sources, and edit or close if it is not good enough. CI runs the site build and compliance gate."

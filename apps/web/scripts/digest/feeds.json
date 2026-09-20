@@ -1,0 +1,22 @@
+{
+  "feeds": [
+    { "publisher": "Land Line", "url": "https://landline.media/feed/" },
+    { "publisher": "FreightWaves", "url": "https://www.freightwaves.com/news/feed" },
+    { "publisher": "Transport Topics", "url": "https://www.ttnews.com/rss.xml" },
+    { "publisher": "DAT", "url": "https://www.dat.com/blog/rss" },
+    { "publisher": "Trucking Info", "url": "https://www.truckinginfo.com/rss/news" }
+  ],
+  "keywords": {
+    "owner-operator": 4, "owner operator": 4, "independent driver": 3, "small carrier": 3,
+    "per diem": 4, "ifta": 4, "fuel tax": 3, "detention": 3, "deadhead": 3, "cost per mile": 4,
+    "spot rate": 3, "contract rate": 2, "rate per mile": 3, "diesel": 2, "fuel price": 2,
+    "hours of service": 2, "fmcsa": 1, "eld": 1, "broker": 1, "load board": 2, "insurance": 1,
+    "tax": 1, "reefer": 1, "flatbed": 1, "dry van": 1, "capacity": 1, "operating cost": 3
+  },
+  "minScore": 4,
+  "maxAgeHours": 96,
+  "minSources": 3,
+  "maxSources": 5,
+  "minWords": 450,
+  "maxWords": 800
+}
