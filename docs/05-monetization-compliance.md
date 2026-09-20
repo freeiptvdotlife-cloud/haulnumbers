@@ -47,7 +47,7 @@ Sources: [AdSense ad placement policies](https://support.google.com/adsense/answ
 | Test ids in dev, never a test-id fallback in release | `adUnits.test.ts` |
 | Minimal permissions and no backup or deep links | `app.config.ts`; verified in the generated manifest (`tools:node="remove"` on four permissions) |
 
-Play data-safety inputs (complete in Phase 3.6): permissions requested by our config are `INTERNET` only; the AdMob SDK merges `ACCESS_NETWORK_STATE` and `com.google.android.gms.permission.AD_ID` (confirm in the built APK's manifest with `aapt2 dump permissions`).
+Play data-safety inputs (complete in Phase 3.6). **Verified on the built release APK (2026-09-20, `aapt2 dump permissions`):** `INTERNET`, `WAKE_LOCK`, `ACCESS_NETWORK_STATE`, `com.google.android.gms.permission.AD_ID`, `ACCESS_ADSERVICES_AD_ID`, `ACCESS_ADSERVICES_ATTRIBUTION`, `ACCESS_ADSERVICES_TOPICS`, `FOREGROUND_SERVICE`, and AndroidX's `<package>.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`. Only `INTERNET` is requested by our own config; the manifest-merger report shows the ad and network permissions come from `react-native-google-mobile-ads` / Play services ads, and **`FOREGROUND_SERVICE` comes from `androidx.work:work-runtime` (a dependency of the ads SDK); the app never starts a foreground service.** If Play Console asks about foreground services, that is the source. `SYSTEM_ALERT_WINDOW` appears only in debug builds (React Native's debug overlay) and is absent from release.
 
 ### Testing before real ads exist
 **AdMob (app) has real test ids; AdSense (web) has none.**

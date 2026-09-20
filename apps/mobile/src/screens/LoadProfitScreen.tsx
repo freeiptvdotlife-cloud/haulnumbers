@@ -3,6 +3,8 @@ import { useMemo } from "react";
 import { describeErrors } from "../lib/errors";
 import { num, pct, usd } from "../lib/format";
 import { useForm } from "../lib/useForm";
+import { SavedScenarios } from "../ui/SavedScenarios";
+import { pickOneOf, pickStrings, asRecord } from "../scenarios/snapshot";
 import { CalculatorScreen } from "../ui/CalculatorScreen";
 import { Card, Disclaimer, ErrorList, Field, Heading, Notice, ResultRows } from "../ui/kit";
 
@@ -14,12 +16,14 @@ const LABELS: Record<string, string> = {
 };
 const toInput = (f: string) => (f === "dispatchFeePct" ? "dispatchPercent" : f === "factoringFeePct" ? "factoringPercent" : f);
 
-export function LoadProfitScreen() {
-  const { v, set } = useForm({
+const DEFAULTS = {
     linehaulRevenue: "2000", fuelSurcharge: "300", accessorials: "100", loadedMiles: "800", deadheadMiles: "200",
     mpg: "6.5", fuelPricePerGallon: "4", tolls: "50", otherTripCosts: "0", nonFuelCostPerMile: "0.3",
     dispatchPercent: "5", factoringPercent: "2", minProfitPerMile: "0.5",
-  });
+  };
+
+export function LoadProfitScreen() {
+  const { v, set, replace } = useForm(DEFAULTS);
   const r = useMemo(() => calculateLoadProfit({
     linehaulRevenue: num(v.linehaulRevenue), fuelSurcharge: num(v.fuelSurcharge), accessorials: num(v.accessorials),
     loadedMiles: num(v.loadedMiles), deadheadMiles: num(v.deadheadMiles), mpg: num(v.mpg), fuelPricePerGallon: num(v.fuelPricePerGallon),
@@ -70,6 +74,7 @@ export function LoadProfitScreen() {
         )}
         <Disclaimer />
       </Card>
+      <SavedScenarios toolId="load-profit" snapshot={v} onLoad={(st) => replace(pickStrings(DEFAULTS, st))} />
     </CalculatorScreen>
   );
 }

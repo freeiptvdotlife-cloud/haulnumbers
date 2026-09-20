@@ -3,6 +3,8 @@ import { useMemo, useState } from "react";
 import { describeErrors } from "../lib/errors";
 import { num, usd } from "../lib/format";
 import { useForm } from "../lib/useForm";
+import { SavedScenarios } from "../ui/SavedScenarios";
+import { pickOneOf, pickStrings, asRecord } from "../scenarios/snapshot";
 import { CalculatorScreen } from "../ui/CalculatorScreen";
 import { Body, Card, Disclaimer, ErrorList, Field, Heading, Notice, ResultRows, Segmented } from "../ui/kit";
 
@@ -11,10 +13,12 @@ const toInput = (f: string) => (f === "subjectToHoursOfService" ? "hos" : f === 
 const AREAS = [{ value: "conus", label: "Continental U.S." }, { value: "oconus", label: "Outside U.S." }] as const;
 const HOS = [{ value: "yes", label: "Yes, 80%" }, { value: "no", label: "No, 50%" }] as const;
 
+const DEFAULTS = { fullDays: "10", partialDays: "2", taxRate: "25" };
+
 export function PerDiemScreen() {
   const period = listPerDiemPeriods()[0] ?? "";
   const table = getPerDiemTable(period);
-  const { v, set } = useForm({ fullDays: "10", partialDays: "2", taxRate: "25" });
+  const { v, set, replace } = useForm(DEFAULTS);
   const [area, setArea] = useState<PerDiemArea>("conus");
   const [hos, setHos] = useState<"yes" | "no">("yes");
   const r = useMemo(() => calculatePerDiem({
@@ -54,6 +58,7 @@ export function PerDiemScreen() {
         <Body muted>{`Rates: IRS ${latest?.notice ?? ""}, retrieved ${latest?.retrievedAt ?? ""}. For self-employed owner-operators; company drivers generally cannot deduct unreimbursed meals.`}</Body>
         <Disclaimer />
       </Card>
+      <SavedScenarios toolId="per-diem" snapshot={{ ...v, area, hos }} onLoad={(st) => { replace(pickStrings(DEFAULTS, st)); setArea(pickOneOf(asRecord(st).area, ["conus", "oconus"] as const, "conus")); setHos(pickOneOf(asRecord(st).hos, ["yes", "no"] as const, "yes")); }} />
     </CalculatorScreen>
   );
 }

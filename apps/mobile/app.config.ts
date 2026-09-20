@@ -16,9 +16,12 @@ const config: ExpoConfig = {
   version: "0.1.0",
   orientation: "default",
   userInterfaceStyle: "automatic",
+  icon: "./assets/icon.png",
+  backgroundColor: "#0b3d2e",
   android: {
     package: "com.haulnumbers.app",
     versionCode: 1,
+    adaptiveIcon: { foregroundImage: "./assets/adaptive-icon.png", backgroundColor: "#0b3d2e" },
     // A calculator needs none of these; every permission widens the Play data-safety declaration.
     blockedPermissions: [
       "android.permission.SYSTEM_ALERT_WINDOW",

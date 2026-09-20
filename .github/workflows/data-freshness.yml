@@ -1,0 +1,23 @@
+name: Rate data freshness
+
+# The core test-suite contains freshness gates: it fails when there is no IFTA rate table for the current
+# quarter or no IRS per diem table covering today. Running it weekly turns "we forgot to update the rates"
+# into a failed run (and an email) instead of a silent stale calculator. Runbooks: docs/06-quality-and-ops.md.
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+jobs:
+  freshness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Rate tables cover today
+        run: npm test -w @haulnumbers/core -- test/iftaData.test.ts test/perDiem.test.ts

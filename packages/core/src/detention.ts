@@ -146,3 +146,101 @@ export function calculateDetention(input: DetentionInput): Result<DetentionResul
     },
   };
 }
+
+// ---------------------------------------------------------------------------------------------
+// Form-level entry point shared by the website and the Android app, so stop handling (blank stops,
+// half-filled stops, clock times, days later) exists in exactly one place.
+// ---------------------------------------------------------------------------------------------
+
+export interface DetentionStopEntry {
+  /** Stable key, e.g. "pickup"; UIs use it to find the matching input. */
+  key: string;
+  /** Display name, e.g. "Pickup". */
+  name: string;
+  /** Raw text as typed, "HH:MM". Blank means "not entered". */
+  arrival: string;
+  departure: string;
+  /** Whole days later; NaN when the field was left blank (reported as an error). */
+  extraDays: number;
+}
+
+export interface DetentionFormInput {
+  stops: DetentionStopEntry[];
+  freeMinutes: number;
+  hourlyRate: number;
+  billingIncrement: BillingIncrement;
+  layoverDays: number;
+  layoverRatePerDay: number;
+}
+
+/** A problem tied to one input. `stopKey` is set for per-stop fields; otherwise `field` is a top-level field. */
+export interface DetentionProblem {
+  stopKey: string | null;
+  /** "arrival" | "departure" | "days" for stop problems; a DetentionInput field name otherwise. */
+  field: string;
+  message: string;
+}
+
+export interface DetentionUsedStop {
+  key: string;
+  name: string;
+  minutes: number;
+}
+
+export type DetentionFormResult =
+  | { ok: true; value: DetentionResult; used: DetentionUsedStop[] }
+  | { ok: false; problems: DetentionProblem[] };
+
+const STOP_FIELD: Record<string, string> = { arrival: "arrival", departure: "departure", extraDays: "days" };
+
+export function calculateDetentionFromTimes(input: DetentionFormInput): DetentionFormResult {
+  const problems: DetentionProblem[] = [];
+  const used: DetentionUsedStop[] = [];
+
+  for (const s of input.stops) {
+    const arrival = s.arrival.trim();
+    const departure = s.departure.trim();
+    if (arrival === "" && departure === "") continue; // stop not used
+    if (arrival === "" || departure === "") {
+      problems.push({
+        stopKey: s.key,
+        field: arrival === "" ? "arrival" : "departure",
+        message: "Enter both arrival and departure, or leave both blank to skip this stop.",
+      });
+      continue;
+    }
+    const t = minutesBetween(arrival, departure, s.extraDays);
+    if (!t.ok) {
+      for (const e of t.errors) problems.push({ stopKey: s.key, field: STOP_FIELD[e.field] ?? "arrival", message: e.message });
+      continue;
+    }
+    used.push({ key: s.key, name: s.name, minutes: t.value });
+  }
+
+  if (used.length === 0 && problems.length === 0) {
+    problems.push({
+      stopKey: input.stops[0]?.key ?? null,
+      field: "arrival",
+      message: "Enter arrival and departure times for at least one stop.",
+    });
+  }
+
+  if (problems.length === 0) {
+    const r = calculateDetention({
+      stops: used.map((u) => ({ minutesOnSite: u.minutes })),
+      freeMinutes: input.freeMinutes,
+      hourlyRate: input.hourlyRate,
+      billingIncrement: input.billingIncrement,
+      layoverDays: input.layoverDays,
+      layoverRatePerDay: input.layoverRatePerDay,
+    });
+    if (r.ok) return { ok: true, value: r.value, used };
+    for (const e of r.errors) {
+      const m = /^stops\[(\d+)\]/.exec(e.field);
+      const stop = m ? used[Number(m[1])] : undefined;
+      // Only "over 7 days" can reach here for a stop; it is fixed by changing "days later".
+      problems.push(stop ? { stopKey: stop.key, field: "days", message: e.message } : { stopKey: null, field: e.field, message: e.message });
+    }
+  }
+  return { ok: false, problems };
+}

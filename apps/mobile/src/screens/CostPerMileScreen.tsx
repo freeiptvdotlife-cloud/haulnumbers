@@ -3,6 +3,8 @@ import { useMemo } from "react";
 import { describeErrors } from "../lib/errors";
 import { num, usd } from "../lib/format";
 import { useForm } from "../lib/useForm";
+import { SavedScenarios } from "../ui/SavedScenarios";
+import { pickOneOf, pickStrings, asRecord } from "../scenarios/snapshot";
 import { CalculatorScreen } from "../ui/CalculatorScreen";
 import { Card, Disclaimer, ErrorList, Field, Heading, ResultRows } from "../ui/kit";
 
@@ -13,11 +15,13 @@ const LABELS: Record<string, string> = {
 };
 const toInput = (f: string) => (f === "targetProfitMargin" ? "marginPercent" : f.replace(/^(fixed|variable)\./, ""));
 
-export function CostPerMileScreen() {
-  const { v, set } = useForm({
+const DEFAULTS = {
     miles: "10000", truckPayment: "2000", insurance: "1500", permitsAndFees: "300", other: "200",
     mpg: "6.5", fuelPricePerGallon: "3.9", maintenancePerMile: "0.15", tiresPerMile: "0.05", otherPerMile: "0", driverPayPerMile: "0", marginPercent: "10",
-  });
+  };
+
+export function CostPerMileScreen() {
+  const { v, set, replace } = useForm(DEFAULTS);
   const r = useMemo(() => calculateCostPerMile({
     miles: num(v.miles),
     fixed: { truckPayment: num(v.truckPayment), insurance: num(v.insurance), permitsAndFees: num(v.permitsAndFees), other: num(v.other) },
@@ -57,6 +61,7 @@ export function CostPerMileScreen() {
         )}
         <Disclaimer />
       </Card>
+      <SavedScenarios toolId="cost-per-mile" snapshot={v} onLoad={(st) => replace(pickStrings(DEFAULTS, st))} />
     </CalculatorScreen>
   );
 }

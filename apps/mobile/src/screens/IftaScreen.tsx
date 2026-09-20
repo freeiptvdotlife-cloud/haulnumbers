@@ -2,6 +2,8 @@ import { IFTA_STATE_NAMES, IFTA_RATE_TABLES, calculateIfta, getIftaRateTable, li
 import { useMemo, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { int, num, numOr0, usd } from "../lib/format";
+import { SavedScenarios } from "../ui/SavedScenarios";
+import { sanitizeIftaState } from "../scenarios/iftaState";
 import { CalculatorScreen } from "../ui/CalculatorScreen";
 import { StatePicker } from "../ui/StatePicker";
 import { Body, Button, Card, Disclaimer, ErrorList, Field, Heading, Notice, ResultRows, Segmented } from "../ui/kit";
@@ -108,6 +110,7 @@ export function IftaScreen() {
         <Body muted>{`Rates: IFTA, Inc. fuel tax matrix, retrieved ${rateTable?.retrievedAt ?? ""}. Negative amounts are credits. Interest, penalties, other fuels and Canada are not included.`}</Body>
         <Disclaimer />
       </Card>
+      <SavedScenarios toolId="ifta" snapshot={{ quarter, untaxed, rows }} onLoad={(st) => { const r = sanitizeIftaState(st, defaultQuarter()); setQuarter(r.quarter); setUntaxed(r.untaxed); setRows(r.rows); setNextId(r.rows.length + 1); }} />
     </CalculatorScreen>
   );
 }

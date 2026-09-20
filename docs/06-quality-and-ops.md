@@ -88,3 +88,27 @@ Run after any change to layout, CSS or a page. Lighthouse and puppeteer are not 
 ## Ad preview builds (web) and test-ad builds (app)
 - `PUBLIC_ADS_PREVIEW=1` swaps each ad slot for a dashed placeholder. Only for reviewing layout; the compliance gate rejects it unless `--allow-preview` is passed. Do not deploy such a build.
 - App: `ADMOB_USE_TEST_IDS=true` for internal/closed testing builds; `APP_ENV=production` plus real ids for release (the config throws otherwise).
+
+## CI and scheduled checks (written, not yet run on GitHub)
+- `.github/workflows/ci.yml`: `npm ci`, `npm test`, `npm run typecheck`, web build, compliance gate, Android bundle, report-only `npm audit --omit=dev`, then a Lighthouse job with the budgets in `lighthouserc.json` (category scores at least 0.95, CLS at most 0.1, LCP at most 2.5 s, TBT at most 200 ms).
+- `.github/workflows/data-freshness.yml`: weekly and on demand; runs the IFTA and per diem freshness tests so stale rates fail loudly.
+- Both parse as valid YAML and the freshness command passes locally; their first real run needs the repository on GitHub.
+
+## Accessibility QA (automated depth)
+Run axe-core (WCAG 2.0/2.1/2.2 A and AA plus best practice) over every page in light and dark at 400 px and 1100 px. Last run: 72 page-runs, 0 violations (it found and we fixed a scrollable table that keyboard users could not reach). A session with a real screen reader is still open.
+
+## AdSense build modes
+| Mode | Variables | What the gate requires |
+|---|---|---|
+| Ad-free (default, CI) | none | no ads, no ad script, no preview placeholder |
+| Layout preview (local only) | `PUBLIC_ADS_PREVIEW=1` | fails unless `--allow-preview`; never deployable |
+| Verification (site ownership) | `PUBLIC_ADSENSE_CLIENT`, `PUBLIC_ADSENSE_VERIFY_ONLY=1`, `PUBLIC_CONTACT_EMAIL`, `ADS_TXT` | account meta tag on the home page, valid `ads.txt`, contact email, **no** ads or ad script |
+| Monetised | as above without `VERIFY_ONLY`, plus six `PUBLIC_ADSENSE_SLOT_*` | an ad unit on each of the ten content pages, none elsewhere, labels, thin-content and privacy checks |
+
+## Daily digest bot
+`apps/web/scripts/digest/` drafts one article a day into `src/content/news/` (pages `/news/` and `/news/<slug>/`). Feeds and keyword weights live in `feeds.json`.
+- **Flow:** fetch RSS/Atom feeds (titles and summaries only, never full-text scraping) → rank fresh, unused, relevant stories → Workers AI picks 3-5 that share a theme → Workers AI writes 450-800 words → the draft must pass `validateArticle` (cites at least 3 sources with exact links, no link outside the sources or our pages, no figure that is absent from the sources, no 8-word run copied from a source, no stock AI phrases). Up to three rewrites with the problems fed back; if none passes, no post is made. Quality beats cadence.
+- **Review gate:** `.github/workflows/digest.yml` runs daily and opens a pull request; merging is the editorial review. Every post carries a visible "drafted with AI, reviewed by an editor" line and a Sources list. Do not merge a post you have not read.
+- **Ads:** digest pages carry no ads for now (they are not in the compliance gate's ad-page list). Add ads only after the posts have proven useful; auto-generated pages are the classic AdSense "low value" risk.
+- **Setup:** repo secrets `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` (token with Workers AI read), and Settings → Actions → "Allow GitHub Actions to create pull requests". PRs opened with the default token do not start CI; close and reopen the PR (or use a fine-grained PAT) to run the checks. Model: `DIGEST_MODEL`, default `@cf/meta/llama-3.3-70b-instruct-fp8-fast`.
+- **Locally:** `npm run digest -- --dry` (fetch and rank, no AI), or with the two env vars set, `npm run digest`.

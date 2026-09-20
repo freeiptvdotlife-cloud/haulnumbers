@@ -70,10 +70,10 @@ export function Segmented<T extends string>({ label, options, value, onChange }:
   );
 }
 
-export function Button({ title, onPress, testID }: { title: string; onPress: () => void; testID?: string }) {
+export function Button({ title, onPress, testID, label }: { title: string; onPress: () => void; testID?: string; label?: string }) {
   const t = useTheme();
   return (
-    <Pressable testID={testID} accessibilityRole="button" onPress={onPress} style={[s.button, { borderColor: t.line, backgroundColor: t.bg }]}>
+    <Pressable testID={testID} accessibilityRole="button" accessibilityLabel={label ?? title} onPress={onPress} style={[s.button, { borderColor: t.line, backgroundColor: t.bg }]}>
       <Text style={{ color: t.fg, fontWeight: "600" }}>{title}</Text>
     </Pressable>
   );

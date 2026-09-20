@@ -1,7 +1,9 @@
-import { calculateDetention, minutesBetween, type BillingIncrement } from "@haulnumbers/core";
+import { calculateDetentionFromTimes, type BillingIncrement } from "@haulnumbers/core";
 import { useMemo, useState } from "react";
-import { num, numOr0, usd } from "../lib/format";
+import { num, usd } from "../lib/format";
 import { useForm } from "../lib/useForm";
+import { SavedScenarios } from "../ui/SavedScenarios";
+import { pickOneOf, pickStrings, asRecord } from "../scenarios/snapshot";
 import { CalculatorScreen } from "../ui/CalculatorScreen";
 import { Body, Card, Disclaimer, ErrorList, Field, Heading, Notice, ResultRows, Segmented, type Row } from "../ui/kit";
 
@@ -11,44 +13,35 @@ const LABELS: Record<string, string> = {
   freeMinutes: "Free time per stop (minutes)", hourlyRate: "Detention rate per hour (USD)", layoverDays: "Layover days", layoverRatePerDay: "Layover rate per day (USD)",
   billingIncrement: "Billing blocks",
 };
-const CORE_TO_INPUT: Record<string, string> = { arrival: "Arrival", departure: "Departure", extraDays: "Days" };
 const STOPS = [{ key: "pickup", name: "Pickup" }, { key: "delivery", name: "Delivery" }] as const;
 const BLOCKS = [{ value: "0", label: "Exact" }, { value: "15", label: "15 min" }, { value: "30", label: "30 min" }, { value: "60", label: "Started hour" }] as const;
 
 const dur = (m: number) => { const h = Math.floor(m / 60), r = m % 60; return h === 0 ? `${r} min` : r === 0 ? `${h} h` : `${h} h ${r} min`; };
 
-// Note: this stop-assembly logic mirrors apps/web/src/pages/detention-pay-calculator.astro. Keep them in step
-// (a candidate to move into core so there is a single copy).
-export function DetentionScreen() {
-  const { v, set } = useForm({
+const DEFAULTS = {
     pickupArrival: "08:00", pickupDeparture: "11:15", pickupDays: "0", deliveryArrival: "", deliveryDeparture: "", deliveryDays: "0",
     freeMinutes: "120", hourlyRate: "50", layoverDays: "0", layoverRatePerDay: "0",
-  });
+  };
+
+export function DetentionScreen() {
+  const { v, set, replace } = useForm(DEFAULTS);
   const [block, setBlock] = useState<"0" | "15" | "30" | "60">("60");
 
   const out = useMemo(() => {
-    const problems: { input: string; message: string }[] = [];
-    const used: { name: string; key: string; minutes: number }[] = [];
-    const text = (k: string) => (v as Record<string, string>)[k]!.trim();
-    for (const s of STOPS) {
-      const arr = text(`${s.key}Arrival`), dep = text(`${s.key}Departure`);
-      if (arr === "" && dep === "") continue;
-      if (arr === "" || dep === "") { problems.push({ input: `${s.key}${arr === "" ? "Arrival" : "Departure"}`, message: "Enter both arrival and departure, or leave both blank to skip this stop." }); continue; }
-      const t = minutesBetween(arr, dep, num(text(`${s.key}Days`)));
-      if (!t.ok) { for (const e of t.errors) problems.push({ input: `${s.key}${CORE_TO_INPUT[e.field] ?? "Arrival"}`, message: e.message }); continue; }
-      used.push({ name: s.name, key: s.key, minutes: t.value });
-    }
-    if (used.length === 0 && problems.length === 0) problems.push({ input: "pickupArrival", message: "Enter arrival and departure times for at least one stop." });
-    const r = problems.length > 0 ? null : calculateDetention({
-      stops: used.map((u) => ({ minutesOnSite: u.minutes })), freeMinutes: num(v.freeMinutes), hourlyRate: num(v.hourlyRate),
+    const r = calculateDetentionFromTimes({
+      stops: STOPS.map((s) => ({
+        key: s.key, name: s.name,
+        arrival: (v as Record<string, string>)[`${s.key}Arrival`]!, departure: (v as Record<string, string>)[`${s.key}Departure`]!,
+        extraDays: num((v as Record<string, string>)[`${s.key}Days`]!),
+      })),
+      freeMinutes: num(v.freeMinutes), hourlyRate: num(v.hourlyRate),
       billingIncrement: Number(block) as BillingIncrement, layoverDays: num(v.layoverDays), layoverRatePerDay: num(v.layoverRatePerDay),
     });
-    if (r && !r.ok) for (const e of r.errors) {
-      const m = /^stops\[(\d+)\]/.exec(e.field);
-      const stop = m ? used[Number(m[1])] : undefined;
-      problems.push({ input: stop ? `${stop.key}Days` : e.field, message: e.message });
-    }
-    return { problems, used, result: r && r.ok ? r.value : null };
+    // Core reports stop problems as (stopKey, field); the inputs are named pickupArrival etc.
+    const inputName = (p: { stopKey: string | null; field: string }) => (p.stopKey ? p.stopKey + p.field.charAt(0).toUpperCase() + p.field.slice(1) : p.field);
+    return r.ok
+      ? { problems: [] as { input: string; message: string }[], used: r.used, result: r.value }
+      : { problems: r.problems.map((p) => ({ input: inputName(p), message: p.message })), used: [], result: null };
   }, [v, block]);
 
   const bad = new Set(out.problems.map((p) => p.input));
@@ -86,6 +79,7 @@ export function DetentionScreen() {
         {out.result && <ResultRows rows={rows} />}
         <Disclaimer />
       </Card>
+      <SavedScenarios toolId="detention" snapshot={{ ...v, block }} onLoad={(st) => { replace(pickStrings(DEFAULTS, st)); setBlock(pickOneOf(asRecord(st).block, ["0", "15", "30", "60"] as const, "60")); }} />
     </CalculatorScreen>
   );
 }

@@ -16,10 +16,10 @@ Each phase has **deliverables** and **exit criteria**. Do not start monetization
 | 1.3 | Per diem calculator (data-driven rates): **core + tests + web page ✅** | M |
 | 1.4 | IFTA quarterly estimator with rate data pipeline: **pipeline + core + tests + web page ✅** (diesel, 48 states) | L |
 | 1.5 | Shared UI components: field, select, field group, result panel (with disclaimer), FAQ, related tools, tool registry, shared global CSS and client helpers **✅** | M |
-| 1.6 | Per-tool content: formula, worked example, FAQ, glossary links (real text, not filler) | L |
-| 1.7 | Hub pages: `/calculators/` **✅** (driven by `data/tools.ts`); `/guides/` deferred until real guides exist, since an empty page hurts AdSense approval | S |
-| 1.8 | Vitest coverage ≥ 90% on core ✅; a11y pass: contrast (WCAG AA, both themes), labels and Lighthouse a11y 100 ✅; keyboard-only pass ✅ (tab order, focus rings, accessible names, skip link, IFTA add/remove/typing); **still open:** a screen-reader pass with real assistive tech | M |
-| 1.9 | Lighthouse CI budget in CI: manual Lighthouse run done (100/100/100/100, CLS 0, all 7 pages); **automating it needs a CI setup, which does not exist yet** | S |
+| 1.6 | Per-tool content: formula, worked example, FAQ (✅ on every tool page) **plus five 1,000-word guides with sources ✅** (`/guides/`); glossary pages deliberately skipped (would be thin) | L |
+| 1.7 | Hub pages: `/calculators/` ✅ and `/guides/` ✅ (built once there were real guides), 404 page ✅ | S |
+| 1.8 | Vitest coverage ≥ 90% on core ✅; a11y pass: contrast (WCAG AA, both themes), labels and Lighthouse a11y 100 ✅; keyboard-only pass ✅ (tab order, focus rings, accessible names, skip link, IFTA add/remove/typing); axe-core WCAG 2.2 AA + best practice: **0 violations on all 18 pages, light/dark, phone/desktop** ✅; **still open:** a session with a real screen reader | M |
+| 1.9 | Lighthouse CI budget in CI: manual Lighthouse run done (100/100/100/100, CLS 0, all 7 pages); **CI written** (`.github/workflows/ci.yml`, `lighthouserc.json` budgets) but not yet run on GitHub, which needs the repository pushed | S |
 
 **Exit:** 5 calculators pass tests, Lighthouse targets met, each tool page has ≥ 600 words of useful original content, disclaimers present.
 
@@ -30,10 +30,11 @@ Each phase has **deliverables** and **exit criteria**. Do not start monetization
 | 2.2 | Cloudflare Pages project, custom domain, HTTPS, www→apex redirect, security headers | S |
 | 2.3 | Search Console (domain property), submit sitemap, IndexNow ping on deploy | S |
 | 2.4 | Privacy, About, Contact and Terms pages ✅ built (privacy policy meets the checklist in doc 05); **needs a real contact email**, which requires the domain | S |
-| 2.5 | Consent management (Google-certified CMP for EEA/UK/CH) | M |
+| 2.5 | Consent management (Google-certified CMP for EEA/UK/CH): configured inside AdSense after approval (`docs/08`) | M |
 | 2.6 | Privacy-friendly analytics (Cloudflare Web Analytics) | S |
 | 2.7 | Apply for AdSense; add `ads.txt`; fix any rejection reasons | S + wait |
 | 2.8 | Create ad units, set `PUBLIC_ADSENSE_CLIENT` / slot env vars and `ADS_TXT`, verify no CLS | M |
+| 2.10 | **Launch checklist** written (`docs/08-launch-checklist.md`): every step that needs the domain or approvals, with exact commands and env vars ✅ | S |
 | 2.9 | **Compliance gate:** `npm run build:web && npm run check:compliance` with production env must pass before every deploy (built and tested; see doc 05) | S |
 
 **Exit:** site live and indexed, AdSense approved, ads render without CLS regressions, consent works.
@@ -51,10 +52,10 @@ Each phase has **deliverables** and **exit criteria**. Do not start monetization
 | # | Task | Size |
 |---|---|---|
 | 3.1 | `apps/mobile` Expo app (TypeScript, Expo SDK 57, expo-router), imports `@haulnumbers/core`: **✅** typecheck clean, 48 Jest tests, full Hermes bundle builds | M |
-| 3.2 | Screens for the 5 calculators, offline: **✅ all five** (results verified equal to the website in tests). **Saved scenarios not built yet** | L |
-| 3.3 | Navigation ✅, dark mode ✅, 48dp touch targets and accessibility labels ✅; **still open:** tablet layout and a TalkBack pass on a real device | M |
-| 3.4 | AdMob, following the App rules in doc 05: **code and tests ✅** (consent-gated init, banner only on calculator screens and hidden while typing, interstitial only when leaving a screen, test ids in dev, fail-closed release ids); **still open:** verification on a real device or emulator (consent form, test ads) | M |
-| 3.5 | Test ads only until release; App Store listing: title, description, screenshots, feature graphic | M |
+| 3.2 | Screens for the 5 calculators, offline: **✅ all five** (results verified equal to the website in tests); **saved scenarios ✅** (on-device, per calculator, delete-all in Settings) | L |
+| 3.3 | Navigation ✅, dark mode ✅, 48dp touch targets and accessibility labels ✅; tablet two-column layout ✅; **still open:** a TalkBack pass on a real device | M |
+| 3.4 | AdMob, following the App rules in doc 05: **code and tests ✅** (consent-gated init, banner only on calculator screens and hidden while typing, interstitial only when leaving a screen, test ids in dev, fail-closed release ids); test-ad mode for Play testing builds and a production-id guard ✅; **still open:** verification on a real device or emulator (consent form, test ads) | M |
+| 3.5 | Test ads only until release; **debug and release APKs built and inspected ✅ (target SDK 36 verified in the artifact)**; store listing: title, descriptions (character limits checked), feature graphic, icons ✅ (`docs/store/`); **screenshots need an emulator or device** | M |
 | 3.6 | Play Console: data safety form, content rating, privacy policy URL, target-API compliance | M |
 | 3.7 | Closed testing: 12 testers opted in for 14 days if the account is a personal account created after 2023-11-13 (otherwise exempt; see doc 05) | M + wait |
 | 3.8 | Crash reporting (Play vitals + optional Sentry), release signing via Play App Signing | S |

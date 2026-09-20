@@ -35,6 +35,12 @@ Expo packages declare `react-native: *`, so npm hoisted 0.87.1 while the app pin
 ## ADR-011 · Interstitial rules live in a pure, tested policy with one trigger · accepted
 AdMob forbids interstitials on launch/exit and while the user is mid-task, and our calculators are forms that recalculate as you type. So `InterstitialPolicy` exposes a single entry point, leaving a calculator screen after a result was viewed, and a test fails if anyone adds another. Numbers (60 s, 180 s, every 3rd leave) are conservative defaults to tune with data.
 
+## ADR-012 · Guides are content pages and may carry one ad unit each · accepted
+Long-form guides (1,000+ words, sourced) are the strongest content for AdSense approval and search. They share one ad unit (`PUBLIC_ADSENSE_SLOT_GUIDE`) so setup stays small. The guides index and every legal page stay ad-free. The gate enforces this by path (`guides/*` yes, `guides` no).
+
+## ADR-013 · AdSense verification stage is an explicit build mode · accepted
+AdSense asks you to verify the site before it issues ad units, so there is a real stage with a publisher id and no slots. Rather than loosening the monetised checks, `PUBLIC_ADSENSE_VERIFY_ONLY=1` selects a stricter-in-a-different-way mode (meta tag present, zero ads). It must be removed once slots exist, and the monetised gate then requires every slot. The verification method (meta tag vs ads.txt vs code snippet) should be confirmed in the AdSense console.
+
 ## Accepted npm advisories (mobile dependency tree)
 `npm audit` reports 14 moderate findings from two advisories, both inside Expo's own dependencies: `uuid` (missing bounds check when a buffer is passed, reached via native-project build tooling) and `decode-uri-component` (slow decoding of malformed percent-encoded input, reached via `query-string`). The offered "fixes" are downgrades to Expo 46 / expo-router 5, which we reject. Neither package is in the shipped Android bundle (verified by searching the Hermes bytecode). Re-run `npm audit` and re-verify at every Expo upgrade; remove this entry when upstream fixes them.
 

@@ -9,10 +9,13 @@
   "scripts": {
     "test": "npm run test -w @haulnumbers/core && npm run test -w @haulnumbers/web && npm run test -w @haulnumbers/mobile",
     "typecheck": "npm run typecheck -w @haulnumbers/core && npm run check -w @haulnumbers/web && npm run typecheck -w @haulnumbers/mobile",
+    "digest": "npm run digest -w @haulnumbers/web --",
     "build:web": "npm run build -w @haulnumbers/web",
     "dev:web": "npm run dev -w @haulnumbers/web",
     "check:compliance": "npm run check:compliance -w @haulnumbers/web",
-    "bundle:mobile": "npm run bundle -w @haulnumbers/mobile"
+    "bundle:mobile": "npm run bundle -w @haulnumbers/mobile",
+    "build:staging": "PUBLIC_NOINDEX=1 PUBLIC_SITE_URL=\"${STAGING_URL:-https://haulnumbers.pages.dev}\" npm run build:web",
+    "deploy:staging": "npm run build:staging && npm run check:compliance && npx --yes wrangler@latest pages deploy apps/web/dist --project-name \"${STAGING_PROJECT:-haulnumbers}\" --branch main"
   },
   "overrides": {
     "react-native": "0.86.3",

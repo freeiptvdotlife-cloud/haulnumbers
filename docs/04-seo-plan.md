@@ -37,9 +37,9 @@ Title ≤ 60 chars with the head term first; meta description 140–160 chars wi
 ## Technical SEO checklist
 - [x] Static HTML, canonical, sitemap, robots
 - [ ] `lastmod` in the sitemap driven by content dates
-- [ ] `BreadcrumbList` schema, `Organization` schema with logo
-- [ ] Open Graph image per tool (generated at build, Phase 1.6)
-- [ ] 404 page, redirects file, `www` → apex
+- [x] `BreadcrumbList` and `Article` schema on guides (tool pages have `WebApplication` and `FAQPage`); `Organization` with logo still open
+- [x] Open Graph image: one shared 1200x630 image (per-page images are a later refinement)
+- [x] 404 page (noindex); [ ] redirects file and `www` → apex (Cloudflare, `docs/08`)
 - [ ] `hreflang`: not needed (single language)
 - [ ] Core Web Vitals monitored in Search Console (field data)
 - [ ] Structured-data validation in CI (Rich Results test locally before launch)
@@ -65,6 +65,9 @@ Allowed: pages where each URL has **distinct, useful data** (e.g., IFTA rate per
 
 ## Off-page (Phase 5)
 Trucking communities and forums (follow rules, be useful), owner-operator bookkeeping and dispatcher blogs, a "cite this / embed this calculator" widget with attribution, data-driven mini-studies ("2026 diesel price vs breakeven rate"), HARO-style expert responses. No paid links, no link exchanges.
+
+## Status (2026-09-20)
+Five guides are written (about 1,100 words each, with worked examples and primary sources where the topic is IRS or IFTA rules), linked from their calculators, the homepage, the hub and the footer. Keyword and URL tracking lives in `docs/seo-tracker.csv`; volumes are still unmeasured and must come from Search Console or Keyword Planner after launch. Guides are allowed to carry one ad unit each (they are content pages); the guides index never does.
 
 ## Measurement
 Weekly: Search Console (impressions, clicks, CTR, position by page/query, CWV, indexing report). Monthly: update the tracker, prune or improve pages with impressions but no clicks (title/description tests), merge cannibalizing pages.

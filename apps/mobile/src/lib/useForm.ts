@@ -4,5 +4,6 @@ import { useCallback, useState } from "react";
 export function useForm<T extends Record<string, string>>(initial: T) {
   const [v, setV] = useState<T>(initial);
   const set = useCallback(<K extends keyof T>(key: K) => (text: string) => setV((prev) => ({ ...prev, [key]: text })), []);
-  return { v, set };
+  const replace = useCallback((next: T) => setV(next), []);
+  return { v, set, replace };
 }

@@ -5,6 +5,8 @@ import { join, relative, sep } from "node:path";
 
 /** The only pages allowed to carry ads: pages whose main content is the calculator plus its explanation. */
 export const AD_PAGES = ["cost-per-mile-calculator", "load-profit-calculator", "detention-pay-calculator", "ifta-calculator", "per-diem-calculator"];
+/** Guide articles are content pages too (ads allowed), but the guides index is a listing, so it is not. */
+export const isAdPage = (key) => AD_PAGES.includes(key) || (key.startsWith("guides/") && key.length > "guides/".length);
 /** Pages every site needs; none of them may ever carry ads (no ads on non-content pages). */
 export const REQUIRED_PAGES = ["privacy", "about", "contact", "terms"];
 export const MIN_WORDS_ON_AD_PAGE = 300;
@@ -62,10 +64,10 @@ export function checkDist(dist, env = {}) {
     // A preview placeholder is never deployable. It is only tolerated when explicitly allowed (local layout review).
     if (hasPreview && !env.ALLOW_PREVIEW) fail("preview", `/${key === "/" ? "" : key + "/"} contains the ad PREVIEW placeholder: this build must not be deployed (use --allow-preview only for local review)`);
     // The loader may only be on ad pages: elsewhere it would let Auto ads reach non-content pages.
-    if (hasLoader && !AD_PAGES.includes(key)) fail("ad-placement", `/${key === "/" ? "" : key + "/"} loads the AdSense script but is not a content page`);
+    if (hasLoader && !isAdPage(key)) fail("ad-placement", `/${key === "/" ? "" : key + "/"} loads the AdSense script but is not a content page`);
     if (hasRealAd && !hasLoader) fail("ads-config", `/${key}/ has an ad unit but does not load the AdSense script`);
     if (!hasAd) continue;
-    if (!AD_PAGES.includes(key)) { fail("ad-placement", `/${key}/ carries ads but is not a content page (ads are not allowed on non-content pages)`); continue; }
+    if (!isAdPage(key)) { fail("ad-placement", `/${key}/ carries ads but is not a content page (ads are not allowed on non-content pages)`); continue; }
     if (!/>\s*Advertisement\s*</.test(html)) fail("ad-label", `/${key}/ has an ad without a visible "Advertisement" label`);
     const words = visibleText(mainHtml(html)).split(" ").length;
     if (words < MIN_WORDS_ON_AD_PAGE) fail("thin-content", `/${key}/ has an ad but only ${words} words (need at least ${MIN_WORDS_ON_AD_PAGE})`);
@@ -109,10 +111,38 @@ export function checkDist(dist, env = {}) {
     if (pub && lines.length > 0 && !lines.some((l) => l.includes(pub[1]))) fail("ads.txt", `ads.txt does not contain publisher id ${pub[1]}`);
     if (!env.PUBLIC_CONTACT_EMAIL) fail("contact", "PUBLIC_CONTACT_EMAIL must be set before ads go live");
     else if (pages.has("contact") && !pages.get("contact").includes(env.PUBLIC_CONTACT_EMAIL)) fail("contact", "the contact page does not show PUBLIC_CONTACT_EMAIL");
-    for (const name of AD_PAGES) if (pages.has(name) && !pages.get(name).includes("data-ad-slot")) fail("ads-config", `/${name}/ has no ad unit configured (set its PUBLIC_ADSENSE_SLOT_* variable)`);
+    const verifyOnly = Boolean(env.PUBLIC_ADSENSE_VERIFY_ONLY);
+    if (verifyOnly) {
+      // Site-verification stage: the publisher id is set (so AdSense can verify ownership) but no ad units exist yet.
+      if (!(pages.get("/") ?? "").includes(`name="google-adsense-account" content="${env.PUBLIC_ADSENSE_CLIENT}"`)) fail("verify-only", "the home page is missing the google-adsense-account meta tag");
+      for (const [key, html] of pages) if (html.includes("data-ad-slot") || html.includes("pagead2.googlesyndication.com")) fail("verify-only", `/${key === "/" ? "" : key + "/"} contains ads, but PUBLIC_ADSENSE_VERIFY_ONLY is set (unset it once ad units exist)`);
+    } else {
+      for (const [key, html] of pages) if (isAdPage(key) && !html.includes("data-ad-slot")) fail("ads-config", `/${key}/ has no ad unit configured (set its PUBLIC_ADSENSE_SLOT_* variable)`);
+    }
   } else {
     for (const [key, html] of pages) if (html.includes("adsbygoogle")) fail("ads-config", `/${key === "/" ? "" : key + "/"} carries ads or the AdSense script but PUBLIC_ADSENSE_CLIENT is not set`);
   }
+
+  // 5b. A monetised (production) build must be indexable; only the 404 page may be noindex. A staging build
+  // (PUBLIC_NOINDEX=1) must never carry ads.
+  for (const [key, html] of pages) {
+    const noindex = /<meta[^>]*name="robots"[^>]*content="[^"]*noindex/i.test(html);
+    if (noindex && key !== "404" && clientSet) fail("noindex", `/${key === "/" ? "" : key + "/"} is set to noindex in a monetised build (is PUBLIC_NOINDEX still set?)`);
+  }
+
+  // 5c. Every address the site publishes about itself must share ONE origin. This catches a hard-coded production
+  // URL leaking into a staging build (or the reverse), which would point canonicals and the sitemap at the wrong site.
+  const origins = new Map();
+  const note = (url, where) => { try { const o = new URL(url).origin; (origins.get(o) ?? origins.set(o, []).get(o)).push(where); } catch { /* not a URL */ } };
+  for (const [key, html] of pages) {
+    for (const m of html.matchAll(/<link[^>]*rel="canonical"[^>]*href="([^"]+)"/g)) note(m[1], `canonical of /${key}/`);
+    for (const m of html.matchAll(/<meta[^>]*property="og:(?:url|image)"[^>]*content="([^"]+)"/g)) note(m[1], `og tag of /${key}/`);
+    for (const ld of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) for (const m of ld[1].matchAll(/"(?:url|item|mainEntityOfPage)":"([^"]+)"/g)) note(m[1], `structured data of /${key}/`);
+  }
+  for (const m of sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)) note(m[1], "sitemap");
+  const robotsForOrigin = existsSync(join(dist, "robots.txt")) ? readFileSync(join(dist, "robots.txt"), "utf8") : "";
+  for (const m of robotsForOrigin.matchAll(/^Sitemap:\s*(\S+)/gim)) note(m[1], "robots.txt");
+  if (origins.size > 1) fail("site-url", `the build mixes site addresses: ${[...origins].map(([o, w]) => `${o} (${w.slice(0, 2).join(", ")}${w.length > 2 ? ", ..." : ""})`).join(" vs ")}`);
 
   // 6. Crawlers (including Google's ad crawler) must be allowed.
   const robotsPath = join(dist, "robots.txt");

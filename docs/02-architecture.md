@@ -38,8 +38,9 @@ apps/web/src/
   lib/toolUi.ts  client helpers: usd, num (blank = NaN), renderRows, showErrors, bindForm ...
   lib/seo.ts     toolJsonLd(): WebApplication + FAQPage structured data
   styles/tool.css  shared, GLOBAL styles (see the rule below)
-  pages/  index, calculators/, guides/, glossary/, about, privacy, terms, contact
-  content/  guides/*.md (Astro content collections, typed frontmatter)
+  pages/  index, calculators, guides/ (index + five articles), 404, about, privacy, terms, contact, ads.txt, app-ads.txt
+  data/guides.ts  the guide registry (index, nav, related links, JSON-LD read it); layouts/Guide.astro renders articles
+  public/  robots.txt, _headers (security + cache headers for Cloudflare Pages), og-default.png, apple-touch-icon.png
 apps/mobile/  Expo app: app/ (routes), src/screens, src/ads, src/ui, src/lib
 docs/
 ```
@@ -53,7 +54,8 @@ docs/
 - **Styles for anything created by JavaScript must be global.** Astro scopes a page's `<style>` to elements its template rendered, so `dt`/`dd`, table cells and cloned rows built in a script never match scoped rules. Shared calculator styles live in `styles/tool.css`; a page-level `<style>` must be `is:global` if it styles script-created elements. (Found in Phase 1: the first versions of the result rows were unstyled for this reason.)
 - **Fieldsets must set `min-width:0`.** A `<fieldset>` defaults to `min-width:min-content`, so a grid inside cannot shrink below its widest `<select>` option and the page overflows a phone screen (found on the IFTA page at 400px). Inputs and selects also set `min-width:0`, and grid columns use `minmax(0,1fr)` or `minmax(min(240px,100%),1fr)`.
 - **A new calculator** is: a core module + tests, a page built from `Field`/`SelectField`/`FieldGroup`/`ResultPanel`/`Faq`/`RelatedTools` and `toolUi.ts`, and one entry in `data/tools.ts`, which adds it to the nav, the homepage and every page's related-tools list.
-- **Ads:** `AdSlot` reserves height, renders nothing without env vars, never inside forms or between an input and its result.
+- **Ads:** `AdSlot` reserves height, renders nothing without env vars, never inside forms or between an input and its result. It supports four modes: ad-free (default), `PUBLIC_ADS_PREVIEW=1` placeholder for layout review, verification-only (`PUBLIC_ADSENSE_VERIFY_ONLY=1`: account meta tag, no ad code), and monetised. The compliance gate knows all four (docs/05, docs/06).
+- **Search visibility:** `PUBLIC_NOINDEX=1` marks a whole build as staging (noindex, nofollow); the 404 page is always noindex; the gate rejects noindex in a monetised build.
 - **Headers (Cloudflare `_headers`):** long-cache hashed assets, `X-Content-Type-Options`, `Referrer-Policy`, a CSP allowing only Google ad/consent origins once ads are enabled.
 
 ## Performance budgets (enforced in CI)
@@ -72,8 +74,10 @@ Built with Expo SDK 57 (React Native 0.86, React 19.2, target and compile SDK 36
 - **Ads live only in `CalculatorScreen`** (banner below the scroll area and hidden while the keyboard is up; the leave-screen hook). The home, settings and consent screens carry none.
 - **Ad logic is plain TypeScript with tests, not buried in components:** `interstitialPolicy.ts` (when an interstitial may show; its only entry point is leaving a calculator screen, guarded by a structural test), `interstitialController.ts` (keeps one ad pre-loaded, no retry loop), `consentGate.ts` (nothing is configured, initialised or requested until consent allows it; every failure fails closed), `adUnits.ts` (dev = Google test ids, release = ids from build env or none).
 - **Config:** `app.config.ts` reads `ADMOB_ANDROID_APP_ID`, `ADMOB_ANDROID_BANNER_UNIT_ID`, `ADMOB_ANDROID_INTERSTITIAL_UNIT_ID` (defaults are Google's sample ids). It blocks unneeded permissions, turns off backup, and registers no deep-link scheme.
-- **Not built yet:** saved scenarios (local storage), tablet layout, a native time/date picker for detention (times are typed as HH:MM).
-- **Known duplication:** the detention stop-assembly logic exists in both the web page and `DetentionScreen`; move it into core when next touching either.
+- **Not built yet:** a native time picker for detention (times are typed as HH:MM).
+- **Detention form handling lives in core** (`calculateDetentionFromTimes`), so the web page and `DetentionScreen` share one implementation (previously duplicated; verified byte-identical on the web after the move).
+- **Saved scenarios:** `src/scenarios/` (`ScenarioStore` with an injected key-value backend, AsyncStorage on device). Stored snapshots are untrusted: each screen rebuilds its state through `pickStrings` / `pickOneOf` / `sanitizeIftaState`, so corrupt or hostile data falls back to defaults instead of crashing. Max 30 per calculator, same name replaces, one write at a time, wipe-all in Settings.
+- **Tablet layout:** at 720 dp and wider, `CalculatorScreen` shows inputs on the left and results plus saved scenarios on the right.
 - **Offline first:** all logic is local; rate data is bundled and updated through app releases.
 
 ## Data flow
