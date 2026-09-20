@@ -1,0 +1,71 @@
+---
+import Guide from "../../layouts/Guide.astro";
+---
+<Guide slug="ifta-explained">
+  <p>If your truck crosses state lines, you burn fuel in many states but usually buy it in only a few. The International Fuel Tax Agreement, known as IFTA, exists so you do not have to pay and file with every state separately. Instead you file one quarterly return with your base jurisdiction, and the tax is shared out between states. This guide explains how the return is worked out, in plain steps, so the figures make sense before you file.</p>
+
+  <h2>The idea in one paragraph</h2>
+  <p>Each state charges a tax on diesel. When you fill up, you pay that state's tax in the pump price. But the fuel you buy in Texas may be burned in Kentucky. The return fixes that: it estimates how much fuel you burned in each state from the miles you drove there, compares that with the fuel you bought there, and settles the difference. Where you burned more than you bought, you owe that state. Where you bought more than you burned, you get a credit. The credits and the amounts owed are then added together on one return.</p>
+
+  <h2>What you need to record</h2>
+  <ul>
+    <li><strong>Miles driven in each state</strong>, for every truck on the return. The return instructions say total miles must include every mile driven, including off-highway miles, trip permit miles and non-revenue miles such as deadhead and bobtail.</li>
+    <li><strong>Gallons you bought in each state</strong>, with receipts, for fuel that had that state's tax included in the price.</li>
+    <li><strong>Fuel bought without tax paid</strong>, such as bulk fuel, which counts toward total gallons used but not toward credits.</li>
+    <li><strong>Exempt miles</strong>, if any. Each jurisdiction has its own definition of non-taxable miles, and you must be able to prove an exemption if you claim one.</li>
+  </ul>
+
+  <h2>The calculation, step by step</h2>
+  <ol>
+    <li><strong>Fleet MPG</strong> = total miles in every state ÷ total gallons used. Round to two decimals; for example 5.765 rounds to 5.77.</li>
+    <li><strong>Taxable miles</strong> in a state = miles driven there − exempt miles.</li>
+    <li><strong>Taxable gallons</strong> = taxable miles ÷ fleet MPG, rounded to a whole gallon.</li>
+    <li><strong>Net taxable gallons</strong> = taxable gallons − gallons you bought in that state.</li>
+    <li><strong>Tax or credit</strong> = net taxable gallons × the state's tax rate for the quarter. A negative result is a credit.</li>
+    <li><strong>Add up</strong> the result for every state.</li>
+  </ol>
+  <p>Miles and gallons on the return are rounded to whole numbers, and the fleet MPG uses the same figure for every state in the quarter, so all states are measured against your average fuel economy.</p>
+
+  <h2>A worked example</h2>
+  <p>In a quarter you drive 10,000 miles and buy 1,250 gallons, so your fleet MPG is 8.00. You drove 6,000 miles in Texas and bought 900 gallons there, 2,000 miles in Kentucky and bought 100 gallons, and 2,000 miles in California and bought 250 gallons. Using the 2026 Q3 diesel rates:</p>
+  <div class="tablewrap" tabindex="0" role="region" aria-label="Worked example table, scrolls sideways on small screens">
+  <table>
+    <thead><tr><th>State</th><th class="num">Taxable gallons</th><th class="num">Bought</th><th class="num">Net gallons</th><th class="num">Rate</th><th class="num">Tax or credit</th></tr></thead>
+    <tbody>
+      <tr><td>Texas</td><td class="num">750</td><td class="num">900</td><td class="num">−150</td><td class="num">$0.2000</td><td class="num">−$30.00</td></tr>
+      <tr><td>Kentucky</td><td class="num">250</td><td class="num">100</td><td class="num">150</td><td class="num">$0.2200</td><td class="num">$33.00</td></tr>
+      <tr><td>California</td><td class="num">250</td><td class="num">250</td><td class="num">0</td><td class="num">$0.9790</td><td class="num">$0.00</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Kentucky also adds a surcharge, covered next. Together the return comes to $29.25 net due. You can reproduce this in the <a href="/ifta-calculator/">IFTA calculator</a>, where the example is pre-filled.</p>
+
+  <h2>The Kentucky and Virginia surcharge</h2>
+  <p>Kentucky and Virginia charge a surcharge in addition to the fuel tax. The return instructions say it is calculated on your taxable gallons, that you do <strong>not</strong> deduct the tax-paid gallons when calculating it, and that it is always an amount due and never a credit. In the example, Kentucky's surcharge is 250 taxable gallons × $0.105 = $26.25, on top of its $33.00 of tax, for $59.25 due to Kentucky. Only the base tax can produce a credit.</p>
+
+  <h2>Where the rates come from</h2>
+  <p>Rates change, often every quarter, and each state has its own. IFTA, Inc. publishes a fuel tax matrix for every quarter and it is the source to use. The matrix marks a quarter as not final until a stated date, so a rate you see early can still change. This site's calculator reads its diesel rates from that matrix and shows the date it retrieved them and whether a quarter is still preliminary.</p>
+
+  <h2>Mistakes that cost money</h2>
+  <ul>
+    <li><strong>Counting only loaded miles.</strong> Empty miles must be in your total miles, or your MPG comes out too high.</li>
+    <li><strong>Swapping miles and gallons.</strong> A fleet MPG far outside what a truck can do usually means the numbers are in the wrong boxes.</li>
+    <li><strong>Using last quarter's rates.</strong> Always use the rate sheet for the quarter you are filing.</li>
+    <li><strong>Leaving out states where you bought no fuel.</strong> You still owe tax there on the fuel you burned, so enter its miles.</li>
+    <li><strong>Forgetting fuel bought without tax paid.</strong> It counts toward total gallons used.</li>
+    <li><strong>Claiming exempt miles without proof.</strong> The instructions warn that improper exemptions carry penalty and interest.</li>
+  </ul>
+
+  <h2>Filing on time</h2>
+  <p>Returns are generally due by the last day of the month after the quarter ends, but confirm the date with your base jurisdiction. One state's instructions describe a late-filing penalty of 10% of the balance due or $50, whichever is greater, plus interest for each month or part of a month you are late, and interest is not charged on credits. Other jurisdictions may differ, so check your own.</p>
+
+  <h2>What the calculator does not do</h2>
+  <p>The <a href="/ifta-calculator/">IFTA calculator</a> estimates diesel tax in the 48 U.S. member states. It does not cover gasoline or other fuels, Canadian provinces, interest or penalties, and it does not file your return. Use it to see roughly what to expect, then complete your official return with your base jurisdiction's process.</p>
+
+  <h2>Sources</h2>
+  <ul>
+    <li><a href="https://www.iftach.org/taxmatrix4/Taxmatrix.php">IFTA, Inc. fuel tax matrix</a> for the quarterly rates and their final dates.</li>
+    <li><a href="https://tax.wv.gov/Documents/Motorfuel/IFTA/ifta13.instructions.pdf">West Virginia's instructions for completing the IFTA return</a> for the rounding rules, the mileage definition, the surcharge treatment and the late-filing penalty. It is one state's version of the standard form, so confirm details with your own base jurisdiction.</li>
+  </ul>
+  <p>This page is general information, not tax advice.</p>
+</Guide>

@@ -58,7 +58,7 @@ const faqs = [
 
   <ResultPanel title="Your estimate" minHeight="30rem">
     <dl id="summary"></dl>
-    <div class="tablewrap">
+    <div class="tablewrap" tabindex="0" role="region" aria-label="Tax by state, scrolls sideways on small screens">
       <table id="detail" hidden>
         <caption class="sr-only">Tax by state</caption>
         <thead><tr><th scope="col">State</th><th scope="col">Taxable miles</th><th scope="col">Taxable gallons</th><th scope="col">Gallons bought</th><th scope="col">Net gallons</th><th scope="col">Rate per gallon</th><th scope="col">Tax or credit</th><th scope="col">Surcharge</th><th scope="col">Total</th></tr></thead>

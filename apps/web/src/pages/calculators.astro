@@ -1,4 +1,5 @@
 ---
+import Icon from "../components/Icon.astro";
 import Base from "../layouts/Base.astro";
 import { TOOLS, TOOL_GROUPS } from "../data/tools";
 import { SITE_URL } from "../data/site";
@@ -25,7 +26,7 @@ const jsonLd = {
       <ul class="related">
         {TOOLS.filter((t) => t.group === g.id).map((t) => (
           <li class="card">
-            <a href={t.path}><strong>{t.name}</strong></a>
+            <a class="cardlink" href={t.path}><span class="ico-tile"><Icon name={t.icon} /></span><strong>{t.name}</strong></a>
             <p>{t.blurb}</p>
             <p>{t.useWhen}</p>
           </li>
@@ -43,6 +44,8 @@ const jsonLd = {
       <li>Each quarter, use the <a href="/ifta-calculator/">IFTA calculator</a> to estimate your fuel tax, which is part of your true operating cost.</li>
       <li>At tax time, the <a href="/per-diem-calculator/">per diem calculator</a> estimates your meal deduction for days away from home.</li>
     </ol>
+
+    <p>Each calculator has a matching <a href="/guides/">guide</a> that explains the method with worked examples and sources.</p>
 
     <h2>Where the numbers come from</h2>
     <p>Each calculator shows its formula and a worked example. Where a tool depends on official data, the page says where it came from and when we retrieved it. IFTA diesel rates are read from the fuel tax matrix published by IFTA, Inc., and per diem rates come from the IRS notice for the current period. Quarters IFTA has not finalised are labelled preliminary.</p>

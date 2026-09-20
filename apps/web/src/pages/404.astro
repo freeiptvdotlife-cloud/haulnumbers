@@ -1,0 +1,13 @@
+---
+import Base from "../layouts/Base.astro";
+import { TOOLS } from "../data/tools";
+---
+<Base title="Page not found | Haul Numbers" description="The page you were looking for does not exist. Try one of the trucking calculators or guides." noindex>
+  <h1>Page not found</h1>
+  <p>That page does not exist or has moved. Try one of these instead:</p>
+  <ul>
+    {TOOLS.map((t) => <li><a href={t.path}>{t.name}</a></li>)}
+    <li><a href="/guides/">Trucking money guides</a></li>
+    <li><a href="/">Home</a></li>
+  </ul>
+</Base>

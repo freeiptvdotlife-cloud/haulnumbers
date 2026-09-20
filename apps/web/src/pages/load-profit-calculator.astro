@@ -49,7 +49,7 @@ const faqs = [
     </FieldGroup>
   </form>
 
-  <ResultPanel minHeight="28rem">
+  <ResultPanel minHeight="40rem" gauge>
     <p slot="before" id="verdict" class="verdict" hidden></p>
     <dl id="res"></dl>
   </ResultPanel>
@@ -90,11 +90,12 @@ const faqs = [
 
   <script>
     import { calculateLoadProfit } from "@haulnumbers/core";
-    import { bindForm, clearInvalid, fieldLabel, markInvalid, num, renderRows, showErrors, hideErrors, usd } from "../lib/toolUi";
+    import { bindForm, clearInvalid, fieldLabel, markInvalid, num, renderGauge, renderRows, showErrors, hideErrors, usd } from "../lib/toolUi";
 
     const form = document.getElementById("lp") as HTMLFormElement;
     const res = document.getElementById("res") as HTMLElement;
     const err = document.getElementById("err") as HTMLElement;
+    const gauge = document.getElementById("gauge") as HTMLElement;
     const verdictEl = document.getElementById("verdict") as HTMLElement;
     const pct = (n: number) => (n * 100).toLocaleString("en-US", { maximumFractionDigits: 1 }) + "%";
 
@@ -122,6 +123,7 @@ const faqs = [
 
       clearInvalid(form);
       res.replaceChildren();
+      renderGauge(gauge, "", null);
 
       if (!r.ok) {
         verdictEl.hidden = true;
@@ -159,6 +161,12 @@ const faqs = [
         ["Lowest pay to accept", usd(v.minRateToAccept)],
         ["Lowest pay per mile to accept", usd(v.minRatePerMile, 3)],
         ["Lowest linehaul to ask for", usd(v.minLinehaulToAccept)],
+      ]);
+      renderGauge(gauge, "Where the pay goes", [
+        { label: "Fuel", value: v.fuelCost, text: usd(v.fuelCost), tone: "c" },
+        { label: "Fees", value: v.fees, text: usd(v.fees), tone: "b" },
+        { label: "Other costs", value: v.otherCost, text: usd(v.otherCost), tone: "e" },
+        { label: "Your profit", value: v.netProfit, text: usd(v.netProfit), tone: "d" },
       ]);
     }
     bindForm(form, run);

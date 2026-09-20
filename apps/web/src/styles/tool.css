@@ -1,48 +1,101 @@
 /*
- * Shared styles for the calculator pages. These are GLOBAL on purpose: result rows, table cells and
- * IFTA rows are created by JavaScript, and Astro scopes a page's own <style> to elements its template
- * rendered, so scoped rules never reach them.
+ * Calculator components. GLOBAL on purpose: result tiles, gauge segments and IFTA rows are created by
+ * JavaScript, and Astro scopes a page's own <style> to elements its template rendered.
+ * No state below changes an element's box size (borders are always 1px, hover/active use colour, shadow
+ * and a 1px translate only), and every dynamic area has a reserved min-height, so nothing shifts layout.
  */
-label { display:grid; gap:4px; font-size:14px; color:var(--muted); }
-input, select, button.add, button.rm { min-width:0; max-width:100%; font:inherit; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--fg); min-height:44px; }
-input:focus-visible, select:focus-visible, button:focus-visible { outline:3px solid var(--accent); outline-offset:1px; }
-[aria-invalid="true"] { border-color:var(--bad); }
-.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
-.hint { color:var(--muted); font-size:14px; margin:12px 0 0; }
+label { display: grid; gap: 6px; min-width: 0; font-size: 13px; font-weight: 600; letter-spacing: .01em; color: var(--muted); }
+input, select { width: 100%; min-width: 0; max-width: 100%; min-height: 46px; padding: 10px 14px; font: inherit; font-size: 16px; font-weight: 500; letter-spacing: 0; font-variant-numeric: tabular-nums; color: var(--fg); background: var(--field); border: 1px solid var(--line-strong); border-radius: 12px; outline: 2px solid transparent; outline-offset: 2px; transition: border-color .2s, box-shadow .2s, background-color .2s; }
+input:hover, select:hover { border-color: var(--muted); }
+input:focus, select:focus, input:focus-visible, select:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
+input::placeholder { color: var(--muted); }
+select { appearance: none; -webkit-appearance: none; padding-right: 40px; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+[aria-invalid="true"] { border-color: var(--bad); box-shadow: 0 0 0 4px color-mix(in srgb, var(--bad) 22%, transparent); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.hint { color: var(--muted); font-size: 14px; margin: 12px 0 0; }
+@media (forced-colors: active) { input:focus, select:focus, button:focus-visible { outline: 3px solid Highlight; } }
 
-/* A fieldset defaults to min-width:min-content, which stops its grid shrinking below the widest
-   <select> option and pushes the page wider than a phone screen. min-width:0 lets it shrink. */
-fieldset { min-width:0; }
-fieldset.fields { border:0; padding:0; margin:0 0 16px; display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr)); }
-fieldset.block { border:0; padding:0; margin:0 0 16px; }
-label { min-width:0; }
-fieldset legend { font-weight:700; margin-bottom:8px; padding:0; width:100%; }
+/* Buttons: same box in every state. */
+button { font: inherit; font-weight: 650; font-size: 14px; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line-strong); background: var(--tile); color: var(--fg); cursor: pointer; outline: 2px solid transparent; outline-offset: 2px; transition: all .2s; }
+button:hover:not(:disabled) { background: var(--tile-hi); border-color: var(--accent); }
+button:active:not(:disabled) { transform: translateY(1px); box-shadow: inset 0 2px 6px rgba(0, 0, 0, .25); }
+button:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button.add { background: var(--primary); border-color: var(--primary); color: var(--on-primary); box-shadow: 0 6px 16px rgba(37, 99, 235, .25); }
+button.add:hover:not(:disabled) { background: var(--primary-hover); border-color: var(--primary-hover); }
+button.rm:hover:not(:disabled) { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 14%, transparent); }
+
+/* Form groups */
+fieldset { min-width: 0; }
+fieldset.fields { border: 0; padding: 0; margin: 0 0 22px; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
+fieldset.block { border: 0; padding: 0; margin: 0 0 22px; }
+fieldset legend { display: flex; align-items: center; gap: 10px; width: 100%; padding: 0 0 12px; margin: 0; font-size: 15px; font-weight: 750; letter-spacing: -.01em; }
+fieldset legend .ico-tile { width: 30px; height: 30px; border-radius: 9px; }
+form.card > fieldset:last-child { margin-bottom: 0; }
 
 /* Results */
-.result { margin-top:16px; min-height:var(--result-min, 20rem); }
-.result dl { display:grid; grid-template-columns:1fr auto; gap:6px 16px; margin:0 0 12px; }
-.result dt { color:var(--muted); }
-.result dd { margin:0; font-weight:700; text-align:right; font-variant-numeric:tabular-nums; }
-.result dd.big { font-size:1.4em; color:var(--brand); }
-.err { color:var(--bad); }
-.banner, .note { margin:0 0 12px; padding:10px 12px; border-radius:8px; font-weight:600; }
-.banner { border:2px solid var(--accent); }
-.note { border:2px solid var(--line); }
-.verdict { font-weight:700; padding:10px 12px; border-radius:8px; border:2px solid var(--line); margin:0 0 12px; }
-.verdict[data-v="TAKE"] { border-color:var(--brand); }
-.verdict[data-v="NEGOTIATE"] { border-color:var(--accent); }
-.verdict[data-v="SKIP"] { border-color:var(--bad); }
-.source, .disclaimer { color:var(--muted); font-size:13px; margin:8px 0 0; }
-.tablewrap { overflow-x:auto; }
-.result table { border-collapse:collapse; width:100%; min-width:640px; font-variant-numeric:tabular-nums; }
-.result th, .result td { padding:6px 8px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap; }
-.result th:first-child, .result td:first-child { text-align:left; }
-.result thead th { color:var(--muted); font-size:13px; }
-.result td.total { font-weight:700; }
-.notes { color:var(--muted); font-size:14px; }
+.result { margin-top: 20px; min-height: var(--result-min, 20rem); }
+.result h2 { margin-top: 0; }
+.result dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr)); gap: 12px; margin: 0 0 16px; }
+.metric { display: flex; flex-direction: column; justify-content: space-between; gap: 8px; min-height: 5.5rem; min-width: 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--tile); }
+.metric dt { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 600; line-height: 1.3; }
+.metric dt .ico { color: var(--brand); }
+.metric dd { margin: 0; font-size: 1.3rem; line-height: 1.2; font-weight: 750; letter-spacing: -.02em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.metric.big { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); background: linear-gradient(180deg, var(--tile-hi), var(--tile)); min-height: 6.5rem; }
+.metric.big dd { font-size: clamp(1.7rem, 1.3rem + 1.6vw, 2.2rem); color: var(--brand); letter-spacing: -.03em; }
+.err { color: var(--bad); font-weight: 600; }
+.banner, .note { margin: 0 0 14px; padding: 12px 14px; border-radius: 12px; font-weight: 600; border: 1px solid var(--line-strong); background: var(--tile); }
+.banner { border-color: var(--warn); }
+.verdict { font-weight: 700; padding: 12px 14px 12px 16px; border-radius: 12px; border: 1px solid var(--line-strong); border-left: 4px solid var(--line-strong); background: var(--tile); margin: 0 0 14px; }
+.verdict[data-v="TAKE"] { border-color: var(--good); }
+.verdict[data-v="NEGOTIATE"] { border-color: var(--warn); }
+.verdict[data-v="SKIP"] { border-color: var(--bad); }
+.source, .disclaimer { color: var(--muted); font-size: 13px; margin: 10px 0 0; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; }
+.tablewrap:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.result table { border-collapse: collapse; width: 100%; min-width: 640px; font-variant-numeric: tabular-nums; }
+.result th, .result td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.result tr:last-child td { border-bottom: 0; }
+.result th:first-child, .result td:first-child { text-align: left; }
+.result thead th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; background: var(--tile); }
+.result td.total { font-weight: 700; }
+.notes { color: var(--muted); font-size: 14px; }
 
-/* FAQ and related tools */
-details { border-top:1px solid var(--line); padding:8px 0; }
-summary { cursor:pointer; font-weight:600; }
-.related { list-style:none; padding:0; display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
-.related p { margin:.3em 0 0; color:var(--muted); font-size:14px; }
+/* Proportion gauge (pure inline SVG, built by renderGauge). The box is reserved even when empty. */
+.gauge { min-height: 9.5rem; margin: 0 0 16px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--tile); }
+.gauge:empty { visibility: hidden; }
+.gauge h3 { margin: 0 0 12px; font-size: 13px; font-weight: 650; color: var(--muted); letter-spacing: .01em; }
+.gauge .bar { display: block; height: 14px; border-radius: 999px; overflow: hidden; background: var(--line); }
+.gauge .bar svg { display: block; width: 100%; height: 14px; }
+.gauge rect { transition: x .35s ease, width .35s ease; }
+.f-a { fill: var(--c-a); } .f-b { fill: var(--c-b); } .f-c { fill: var(--c-c); } .f-d { fill: var(--c-d); } .f-e { fill: var(--c-e); }
+.legend { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 20px; font-size: 14px; }
+.legend li { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 22px; }
+.legend .sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.legend .v { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sw.f-a { background: var(--c-a); } .sw.f-b { background: var(--c-b); } .sw.f-c { background: var(--c-c); } .sw.f-d { background: var(--c-d); } .sw.f-e { background: var(--c-e); }
+@media (max-width: 420px) { .legend { grid-template-columns: minmax(0, 1fr); } .gauge { min-height: 12.5rem; } }
+
+/* FAQ */
+details { border: 1px solid var(--line); border-radius: 14px; padding: 0 16px; margin: 10px 0; background: var(--card); transition: border-color .2s; }
+details:hover, details[open] { border-color: var(--line-strong); }
+summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; cursor: pointer; font-weight: 650; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: ""; width: 8px; height: 8px; flex: none; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .2s; }
+details[open] summary::after { transform: rotate(225deg); }
+details[open] > :not(summary) { margin-bottom: 14px; }
+summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 8px; }
+
+/* Guides and digest posts (long-form) */
+.crumbs { font-size: 14px; color: var(--muted); margin-top: 14px; }
+.crumbs a { color: var(--muted); }
+.article { max-width: 720px; }
+.article h1 { margin-top: 18px; }
+.article h2 { margin-top: 1.9em; }
+.article p, .article li { line-height: 1.75; }
+.article .meta { color: var(--muted); font-size: 14px; }
+.article .example { border: 1px solid var(--line); border-left: 4px solid var(--accent); padding: 6px 18px; margin: 18px 0; background: var(--tile); border-radius: 0 14px 14px 0; }
+.article table { border-collapse: collapse; width: 100%; margin: 18px 0; font-variant-numeric: tabular-nums; }
+.article th, .article td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+.article thead th { background: var(--tile); font-size: 13px; color: var(--muted); }
+.article td.num, .article th.num { text-align: right; }

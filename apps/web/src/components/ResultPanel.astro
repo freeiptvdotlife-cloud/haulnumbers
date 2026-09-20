@@ -7,8 +7,10 @@
 interface Props {
   title?: string;
   minHeight?: string;
+  /** Reserve and render the proportion-gauge container (#gauge). */
+  gauge?: boolean;
 }
-const { title = "Your results", minHeight = "22rem" } = Astro.props;
+const { title = "Your results", minHeight = "22rem", gauge = false } = Astro.props;
 ---
 <section class="card result" aria-live="polite" aria-labelledby="res-h" style={`--result-min:${minHeight}`}>
   <h2 id="res-h">{title}</h2>
@@ -16,5 +18,6 @@ const { title = "Your results", minHeight = "22rem" } = Astro.props;
   <p id="banner" class="banner" hidden></p>
   <p id="err" class="err" hidden></p>
   <slot />
+  {gauge && <div id="gauge" class="gauge"></div>}
   <p class="disclaimer">Estimate only, not financial, tax or legal advice. Check your own figures and contracts before relying on it.</p>
 </section>

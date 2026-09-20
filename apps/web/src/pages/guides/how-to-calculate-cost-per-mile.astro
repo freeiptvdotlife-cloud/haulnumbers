@@ -1,0 +1,80 @@
+---
+import Guide from "../../layouts/Guide.astro";
+---
+<Guide slug="how-to-calculate-cost-per-mile">
+  <p>Every load decision comes down to one comparison: what the load pays against what it costs you to haul it. If you do not know your cost per mile, you are guessing at the second half of that sentence. This guide shows how to work it out step by step, with a full example, and how to avoid the mistakes that quietly make the number wrong.</p>
+
+  <h2>What cost per mile means</h2>
+  <p>Cost per mile (often shortened to CPM) is everything it costs to run your truck in a period, divided by the miles you drove in that same period. It gives you a single number you can compare with any rate a broker offers. Your <strong>break-even rate</strong> is your cost per mile: a load paying less than that loses money. Your <strong>target rate</strong> is what you need to charge to earn the profit you want on top.</p>
+
+  <h2>Step 1: choose a period and count every mile</h2>
+  <p>Most owner-operators work this out monthly, because insurance, truck payments and fuel are all naturally monthly figures. Pick a month and total the miles you drove. Count <strong>every</strong> mile, including the empty miles you drove to reach a pickup. You are spreading real costs over the real distance the truck travelled, so leaving out empty miles makes your cost per mile look better than it is.</p>
+
+  <h2>Step 2: add up your fixed costs</h2>
+  <p>Fixed costs are the bills that arrive whether the truck moves or not. Write down the monthly amount for each one:</p>
+  <ul>
+    <li>Truck and trailer payments or lease.</li>
+    <li>Insurance. If you pay it quarterly or yearly, divide by the number of months it covers.</li>
+    <li>Permits, registration and fees, again converted to a monthly figure.</li>
+    <li>Everything else that recurs: logging device subscription, accountant, parking, phone, load board.</li>
+  </ul>
+  <p>Divide the fixed total by your miles for the month to get your <strong>fixed cost per mile</strong>.</p>
+
+  <h2>Step 3: add your variable costs</h2>
+  <p>Variable costs rise with every mile:</p>
+  <ul>
+    <li><strong>Fuel per mile</strong> = fuel price per gallon ÷ miles per gallon.</li>
+    <li><strong>Maintenance per mile</strong>: divide what you spent on repairs and servicing by the miles you drove, or reserve a fixed amount per mile.</li>
+    <li><strong>Tires per mile</strong>, handled the same way.</li>
+    <li><strong>Anything else</strong> that scales with distance, such as tolls you always pay on a regular lane.</li>
+    <li><strong>Driver pay per mile</strong> if you pay a driver. If you drive yourself, decide what pay you need and include it, otherwise your profit figure is really just your wage.</li>
+  </ul>
+
+  <h2>Step 4: put it together with a worked example</h2>
+  <p>Suppose a month with 10,000 miles.</p>
+  <table>
+    <thead><tr><th>Item</th><th class="num">Monthly</th><th class="num">Per mile</th></tr></thead>
+    <tbody>
+      <tr><td>Truck payment</td><td class="num">$2,000</td><td class="num">$0.200</td></tr>
+      <tr><td>Insurance</td><td class="num">$1,500</td><td class="num">$0.150</td></tr>
+      <tr><td>Permits and fees</td><td class="num">$300</td><td class="num">$0.030</td></tr>
+      <tr><td>Other fixed</td><td class="num">$200</td><td class="num">$0.020</td></tr>
+      <tr><td>Fuel ($3.90 ÷ 6.5 MPG)</td><td class="num">$6,000</td><td class="num">$0.600</td></tr>
+      <tr><td>Maintenance</td><td class="num">$1,500</td><td class="num">$0.150</td></tr>
+      <tr><td>Tires</td><td class="num">$500</td><td class="num">$0.050</td></tr>
+      <tr><td><strong>Total</strong></td><td class="num"><strong>$12,000</strong></td><td class="num"><strong>$1.200</strong></td></tr>
+    </tbody>
+  </table>
+  <p>The break-even rate is <strong>$1.20 per mile</strong>. In this example the fixed costs are $0.40 per mile and the variable costs are $0.80 per mile.</p>
+
+  <h2>Break-even versus target rate: margin is not markup</h2>
+  <p>Break-even only covers your costs. To earn a profit you need a target rate. The common mistake is adding a percentage to your cost. If you want to keep 10% of what you are paid, the rate is your cost divided by 0.90, not your cost times 1.10:</p>
+  <div class="example">
+    <p><strong>Correct:</strong> $1.20 ÷ (1 − 0.10) = <strong>$1.333 per mile</strong>. Over 10,000 miles that is $13,333.33 of revenue and $1,333.33 of profit, exactly 10% of revenue.</p>
+    <p><strong>Common mistake:</strong> $1.20 × 1.10 = $1.32 per mile. That earns $13,200 and a profit of $1,200, which is only 9.09% of revenue.</p>
+  </div>
+  <p>The gap is small on one load, but it adds up over a year, and it grows as the margin you want grows.</p>
+
+  <h2>Turning a per-mile number into a per-loaded-mile rate</h2>
+  <p>Brokers usually quote a rate per <em>loaded</em> mile, but your cost is spread over <em>all</em> the miles you drive. If 20% of your miles are empty, your loaded miles are 80% of the total, so you need to earn more per loaded mile to cover the same cost. The formula is:</p>
+  <p><strong>Rate needed per loaded mile = rate per mile × total miles ÷ loaded miles.</strong></p>
+  <p>With a $1.20 break-even rate and 20% empty miles, that is $1.20 × 10,000 ÷ 8,000 = <strong>$1.50 per loaded mile</strong> just to break even, and $1.667 for the 10% target. The <a href="/guides/deadhead-miles-explained/">deadhead guide</a> goes deeper on this.</p>
+
+  <h2>Mistakes that make the number wrong</h2>
+  <ul>
+    <li><strong>Leaving out empty miles.</strong> This flatters your cost per mile and makes weak loads look fine.</li>
+    <li><strong>Forgetting costs that are not billed monthly.</strong> Annual permits, quarterly insurance and tire replacements still belong in the calculation as monthly amounts.</li>
+    <li><strong>Mixing periods.</strong> Use the same month for costs and for miles.</li>
+    <li><strong>Using an old fuel price.</strong> Fuel is your biggest variable cost, so refresh it.</li>
+    <li><strong>Treating your own pay as free.</strong> If the number includes no wage for you, "profit" is just your income.</li>
+  </ul>
+
+  <h2>Keep it current</h2>
+  <p>Recalculate whenever something big changes. Fuel is the usual culprit: if the price rises by $0.50 a gallon at 6.5 MPG, your cost rises by about $0.077 per mile, or about $769 a month over 10,000 miles. Insurance renewals and new tires change the number too.</p>
+
+  <h2>Using your number</h2>
+  <p>Once you have a break-even rate and a target rate, use them as a filter. Any offer below your target per loaded mile needs a counter-offer or a pass. The <a href="/cost-per-mile-calculator/">cost per mile calculator</a> does the arithmetic above from your own figures, and the <a href="/load-profit-calculator/">load profit calculator</a> applies your numbers to a specific load, including deadhead and fees.</p>
+
+  <h2>Sources and method</h2>
+  <p>The formulas here are the ones used by the calculators on this site, and every example figure is illustrative. Your own costs will differ, so use your own statements and receipts. Nothing on this page is financial advice.</p>
+</Guide>

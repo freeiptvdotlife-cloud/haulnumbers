@@ -57,7 +57,7 @@ const faqs = [
     </FieldGroup>
   </form>
 
-  <ResultPanel title="Your estimate" minHeight="22rem">
+  <ResultPanel title="Your estimate" minHeight="30rem" gauge>
     <dl id="res"></dl>
     <p class="source">Rates: <a href={latest.sourceUrl}>IRS {latest.notice}</a>, retrieved {latest.retrievedAt}.</p>
   </ResultPanel>
@@ -96,11 +96,12 @@ const faqs = [
 
   <script>
     import { calculatePerDiem, getPerDiemTable, type PerDiemArea } from "@haulnumbers/core";
-    import { bindForm, clearInvalid, fieldLabel, markInvalid, num, renderRows, showErrors, hideErrors, usd } from "../lib/toolUi";
+    import { bindForm, clearInvalid, fieldLabel, markInvalid, num, renderGauge, renderRows, showErrors, hideErrors, usd } from "../lib/toolUi";
 
     const form = document.getElementById("pd") as HTMLFormElement;
     const res = document.getElementById("res") as HTMLElement;
     const err = document.getElementById("err") as HTMLElement;
+    const gauge = document.getElementById("gauge") as HTMLElement;
     const banner = document.getElementById("banner") as HTMLElement;
     const INPUT_NAME: Record<string, string> = { subjectToHoursOfService: "hos", marginalTaxRatePercent: "taxRate" };
 
@@ -118,6 +119,7 @@ const faqs = [
 
       clearInvalid(form);
       res.replaceChildren();
+      renderGauge(gauge, "", null);
       banner.hidden = true;
 
       const table = getPerDiemTable(period);
@@ -145,6 +147,10 @@ const faqs = [
         ["Per diem total", usd(v.perDiemTotal)],
         [`Deductible (${v.deductiblePercent}%)`, usd(v.deductibleAmount), true],
         [`Estimated tax savings at ${v.marginalTaxRatePercent}%`, usd(v.estimatedTaxSavings), true],
+      ]);
+      renderGauge(gauge, "How much of your per diem is deductible", [
+        { label: `Deductible (${v.deductiblePercent}%)`, value: v.deductibleAmount, text: usd(v.deductibleAmount), tone: "a" },
+        { label: "Not deductible", value: v.perDiemTotal - v.deductibleAmount, text: usd(v.perDiemTotal - v.deductibleAmount), tone: "e" },
       ]);
     }
     bindForm(form, run);

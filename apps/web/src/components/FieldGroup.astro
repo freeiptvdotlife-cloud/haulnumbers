@@ -1,4 +1,6 @@
 ---
+import Icon from "./Icon.astro";
+import { iconFor } from "../lib/icons";
 interface Props {
   legend: string;
   /** "fields": responsive grid of inputs. "block": plain container for custom layouts. */
@@ -7,6 +9,6 @@ interface Props {
 const { legend, layout = "fields" } = Astro.props;
 ---
 <fieldset class={layout}>
-  <legend>{legend}</legend>
+  <legend><span class="ico-tile"><Icon name={iconFor(legend)} size={16} /></span>{legend}</legend>
   <slot />
 </fieldset>

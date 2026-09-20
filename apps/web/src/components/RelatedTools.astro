@@ -1,17 +1,27 @@
 ---
+import Icon from "./Icon.astro";
 import { TOOLS } from "../data/tools";
+import { GUIDES } from "../data/guides";
 interface Props {
   /** Path of the current page, which is left out of the list. */
   current: string;
 }
 const { current } = Astro.props;
 const others = TOOLS.filter((t) => t.path !== current);
+const currentTool = TOOLS.find((t) => t.path === current);
+const guide = currentTool?.guide ? GUIDES.find((g) => `/guides/${g.slug}/` === currentTool.guide) : undefined;
 ---
+{guide && (
+  <>
+    <h2>Read the guide</h2>
+    <p><a href={`/guides/${guide.slug}/`}><strong>{guide.title}</strong></a>: {guide.description}</p>
+  </>
+)}
 <h2>More trucking calculators</h2>
 <ul class="related">
   {others.map((t) => (
     <li class="card">
-      <a href={t.path}><strong>{t.name}</strong></a>
+      <a class="cardlink" href={t.path}><span class="ico-tile"><Icon name={t.icon} /></span><strong>{t.name}</strong></a>
       <p>{t.blurb}</p>
     </li>
   ))}

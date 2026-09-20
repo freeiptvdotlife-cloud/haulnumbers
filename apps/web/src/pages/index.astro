@@ -1,22 +1,33 @@
 ---
 import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
 import { TOOLS } from "../data/tools";
+import { SITE_URL } from "../data/site";
+import { GUIDES } from "../data/guides";
 ---
 <Base
   title="Haul Numbers: Free Calculators for Owner-Operator Truckers"
   description="Free trucking calculators for owner-operators: cost per mile, load profit with deadhead, detention pay, IFTA fuel tax, per diem, and more. Know your numbers before you take the load."
-  jsonLd={{ "@context": "https://schema.org", "@type": "WebSite", name: "Haul Numbers", url: "https://haulnumbers.com/" }}
+  jsonLd={{ "@context": "https://schema.org", "@type": "WebSite", name: "Haul Numbers", url: `${SITE_URL}/` }}
 >
   <h1>Know your numbers before you take the load</h1>
   <p>Free, fast calculators built for owner-operators. No sign-up, and your figures never leave your device.</p>
   <ul class="tools">
     {TOOLS.map((t) => (
       <li class="card">
-        <a href={t.path}><strong>{t.name}</strong></a>
+        <a class="cardlink" href={t.path}><span class="ico-tile"><Icon name={t.icon} /></span><strong>{t.name}</strong></a>
         <p>{t.blurb}</p>
       </li>
     ))}
   </ul>
   <p><a href="/calculators/">See all calculators and how they fit together</a></p>
-  <style>.tools{list-style:none;padding:0;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))} .tools p{margin:.4em 0 0;color:var(--muted)} .soon{color:var(--muted)}</style>
+  <h2>Guides</h2>
+  <ul class="tools">
+    {GUIDES.map((g) => (
+      <li class="card">
+        <a class="cardlink" href={`/guides/${g.slug}/`}><span class="ico-tile"><Icon name="book" /></span><strong>{g.title}</strong></a>
+        <p>{g.description}</p>
+      </li>
+    ))}
+  </ul>
 </Base>

@@ -1,0 +1,29 @@
+---
+import Base from "../../layouts/Base.astro";
+import { GUIDES } from "../../data/guides";
+import { SITE_URL } from "../../data/site";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Trucking guides for owner-operators",
+  itemListElement: GUIDES.map((g, i) => ({ "@type": "ListItem", position: i + 1, name: g.title, url: `${SITE_URL}/guides/${g.slug}/` })),
+};
+---
+<Base
+  title="Trucking Money Guides for Owner-Operators"
+  description="Plain-English guides for owner-operator truckers: cost per mile, deadhead miles, IFTA fuel tax, detention pay and per diem, each with worked examples and sources."
+  jsonLd={jsonLd}
+>
+  <h1>Trucking money guides</h1>
+  <p>Practical explanations of the numbers behind the calculators, each with a worked example. Where a guide relies on an official source, such as an IRS publication or IFTA return instructions, it links to it, so you can check the detail yourself.</p>
+  <ul class="related">
+    {GUIDES.map((g) => (
+      <li class="card">
+        <a href={`/guides/${g.slug}/`}><strong>{g.title}</strong></a>
+        <p>{g.description}</p>
+      </li>
+    ))}
+  </ul>
+  <p>Prefer to run the numbers yourself? See all the <a href="/calculators/">trucking calculators</a>.</p>
+</Base>

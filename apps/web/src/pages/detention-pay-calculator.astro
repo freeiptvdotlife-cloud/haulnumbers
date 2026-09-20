@@ -94,7 +94,7 @@ const billingOptions = [
   </section>
 
   <script>
-    import { calculateDetention, minutesBetween, type BillingIncrement } from "@haulnumbers/core";
+    import { calculateDetentionFromTimes, type BillingIncrement } from "@haulnumbers/core";
     import { bindForm, clearInvalid, fieldLabel, markInvalid, num, renderRows, showErrors, hideErrors, str, usd } from "../lib/toolUi";
 
     const form = document.getElementById("dp") as HTMLFormElement;
@@ -110,55 +110,33 @@ const billingOptions = [
       { key: "pickup", name: "Pickup" },
       { key: "delivery", name: "Delivery" },
     ] as const;
-    const CORE_TO_INPUT: Record<string, string> = { arrival: "Arrival", departure: "Departure", extraDays: "Days" };
+    // Core reports stop problems as (stopKey, "arrival" | "departure" | "days"); the inputs are named pickupArrival etc.
+    const inputName = (p: { stopKey: string | null; field: string }) =>
+      p.stopKey ? p.stopKey + p.field.charAt(0).toUpperCase() + p.field.slice(1) : p.field;
 
     function run() {
       const fd = new FormData(form);
-      const problems: { input: string; message: string }[] = [];
-      const used: { name: string; key: string; minutes: number }[] = [];
-
-      for (const s of STOPS) {
-        const arr = str(fd, `${s.key}Arrival`), dep = str(fd, `${s.key}Departure`);
-        if (arr === "" && dep === "") continue; // stop not used
-        if (arr === "" || dep === "") {
-          problems.push({ input: `${s.key}${arr === "" ? "Arrival" : "Departure"}`, message: "Enter both arrival and departure, or leave both blank to skip this stop." });
-          continue;
-        }
-        const t = minutesBetween(arr, dep, num(fd, `${s.key}Days`));
-        if (!t.ok) {
-          for (const e of t.errors) problems.push({ input: `${s.key}${CORE_TO_INPUT[e.field] ?? "Arrival"}`, message: e.message });
-          continue;
-        }
-        used.push({ name: s.name, key: s.key, minutes: t.value });
-      }
-      if (used.length === 0 && problems.length === 0) {
-        problems.push({ input: "pickupArrival", message: "Enter arrival and departure times for at least one stop." });
-      }
-
-      const r = problems.length > 0 ? null : calculateDetention({
-        stops: used.map((u) => ({ minutesOnSite: u.minutes })),
+      const r = calculateDetentionFromTimes({
+        stops: STOPS.map((s) => ({
+          key: s.key, name: s.name,
+          arrival: str(fd, `${s.key}Arrival`), departure: str(fd, `${s.key}Departure`), extraDays: num(fd, `${s.key}Days`),
+        })),
         freeMinutes: num(fd, "freeMinutes"),
         hourlyRate: num(fd, "hourlyRate"),
         billingIncrement: num(fd, "billingIncrement") as BillingIncrement,
         layoverDays: num(fd, "layoverDays"),
         layoverRatePerDay: num(fd, "layoverRatePerDay"),
       });
-      if (r && !r.ok) {
-        for (const e of r.errors) {
-          const m = /^stops\[(\d+)\]/.exec(e.field);
-          const stop = m ? used[Number(m[1])] : undefined;
-          problems.push({ input: stop ? `${stop.key}Days` : e.field, message: e.message });
-        }
-      }
 
       clearInvalid(form);
       res.replaceChildren();
       note.hidden = true;
 
-      if (problems.length > 0 || !r || !r.ok) {
-        showErrors(err, problems.map((p) => {
-          markInvalid(form, p.input);
-          return `${fieldLabel(form, p.input)}: ${p.message}`;
+      if (!r.ok) {
+        showErrors(err, r.problems.map((p) => {
+          const name = inputName(p);
+          markInvalid(form, name);
+          return `${fieldLabel(form, name)}: ${p.message}`;
         }));
         return;
       }
@@ -167,7 +145,7 @@ const billingOptions = [
       const v = r.value;
       const rows: [string, string, boolean?][] = [];
       v.stops.forEach((s, i) => {
-        const name = used[i]?.name ?? `Stop ${i + 1}`;
+        const name = r.used[i]?.name ?? `Stop ${i + 1}`;
         rows.push([`${name}: time on site`, dur(s.minutesOnSite)]);
         rows.push([`${name}: billable time`, dur(s.billableMinutes)]);
         rows.push([`${name}: detention pay`, usd(s.pay)]);

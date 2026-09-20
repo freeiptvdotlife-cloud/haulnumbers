@@ -47,7 +47,7 @@ const faqs = [
     </FieldGroup>
   </form>
 
-  <ResultPanel minHeight="18rem">
+  <ResultPanel minHeight="30rem" gauge>
     <dl id="res"></dl>
   </ResultPanel>
 
@@ -69,11 +69,12 @@ const faqs = [
 
   <script>
     import { calculateCostPerMile } from "@haulnumbers/core";
-    import { bindForm, clearInvalid, fieldLabel, markInvalid, num, renderRows, showErrors, hideErrors, usd } from "../lib/toolUi";
+    import { bindForm, clearInvalid, fieldLabel, markInvalid, num, renderGauge, renderRows, showErrors, hideErrors, usd } from "../lib/toolUi";
 
     const form = document.getElementById("cpm") as HTMLFormElement;
     const res = document.getElementById("res") as HTMLElement;
     const err = document.getElementById("err") as HTMLElement;
+    const gauge = document.getElementById("gauge") as HTMLElement;
 
     // Core field path -> the input's name on this page.
     const inputName = (field: string) =>
@@ -90,6 +91,7 @@ const faqs = [
       });
       clearInvalid(form);
       res.replaceChildren();
+      renderGauge(gauge, "", null);
       if (!r.ok) {
         showErrors(err, r.errors.map((e) => {
           const name = inputName(e.field);
@@ -108,6 +110,11 @@ const faqs = [
         ["Fuel per mile", usd(v.fuelPerMile, 3)],
         ["Total monthly cost", usd(v.totalCost)],
         ["Profit at target rate", usd(v.targetProfit)],
+      ]);
+      renderGauge(gauge, "Where each mile's cost goes", [
+        { label: "Fixed costs", value: v.fixedPerMile, text: usd(v.fixedPerMile, 3), tone: "a" },
+        { label: "Fuel", value: v.fuelPerMile, text: usd(v.fuelPerMile, 3), tone: "c" },
+        { label: "Maintenance, tires, driver and other", value: v.costPerMile - v.fixedPerMile - v.fuelPerMile, text: usd(v.costPerMile - v.fixedPerMile - v.fuelPerMile, 3), tone: "e" },
       ]);
     }
     bindForm(form, run);
