@@ -43,15 +43,31 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     {ld.map((o) => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
+    <script is:inline>
+      // Runs before paint: apply any saved theme choice ahead of the CSS's own OS-based default,
+      // so a returning visitor never sees a flash of the wrong theme.
+      (function () {
+        var stored = null;
+        try { stored = localStorage.getItem("theme"); } catch (e) {}
+        if (stored === "light" || stored === "dark") document.documentElement.setAttribute("data-theme", stored);
+      })();
+    </script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <header class="site">
       <a class="brand" href="/"><span class="mark"><Icon name="truck" size={20} /></span>Haul Numbers</a>
-      <nav class="main" aria-label="Main">
-        {TOOLS.map((t) => (<a href={t.path} aria-current={here === t.path ? "page" : undefined}><Icon name={t.icon} size={16} />{t.navLabel}</a>))}
-        <a href="/guides/" aria-current={here.startsWith("/guides/") ? "page" : undefined}><Icon name="book" size={16} />Guides</a>
-      </nav>
+      <div class="header-controls">
+        <nav class="main" aria-label="Main">
+          {TOOLS.map((t) => (<a href={t.path} aria-current={here === t.path ? "page" : undefined}><Icon name={t.icon} size={16} />{t.navLabel}</a>))}
+          <a href="/guides/" aria-current={here.startsWith("/guides/") ? "page" : undefined}><Icon name="book" size={16} />Guides</a>
+        </nav>
+        <button type="button" id="theme-toggle" class="theme-toggle" aria-pressed="false">
+          <span class="i-sun"><Icon name="sun" size={20} /></span>
+          <span class="i-moon"><Icon name="moon" size={20} /></span>
+          <span class="sr-only" data-toggle-label>Switch to light theme</span>
+        </button>
+      </div>
     </header>
     <main id="main" tabindex="-1"><slot /></main>
     <footer class="site">
@@ -60,3 +76,33 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     </footer>
   </body>
 </html>
+<script>
+  // Whether the page is currently dark: an explicit choice on <html data-theme> wins; otherwise OS preference.
+  function isDark(): boolean {
+    const explicit = document.documentElement.getAttribute("data-theme");
+    if (explicit === "light") return false;
+    if (explicit === "dark") return true;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+
+  const toggle = document.getElementById("theme-toggle");
+  const label = toggle?.querySelector("[data-toggle-label]");
+
+  function sync() {
+    const dark = isDark();
+    toggle?.setAttribute("aria-pressed", String(dark));
+    if (label) label.textContent = dark ? "Switch to light theme" : "Switch to dark theme";
+  }
+  sync();
+
+  toggle?.addEventListener("click", () => {
+    const next = isDark() ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try {
+      localStorage.setItem("theme", next);
+    } catch {
+      // Private browsing or storage disabled: the choice still applies for this page view.
+    }
+    sync();
+  });
+</script>

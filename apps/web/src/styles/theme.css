@@ -18,7 +18,8 @@
   --radius: 16px;
 }
 @media (prefers-color-scheme: light) {
-  :root {
+  /* :not([data-theme="dark"]) lets an explicit dark choice below win over a light OS preference. */
+  :root:not([data-theme="dark"]) {
     color-scheme: light;
     --bg: #f4f5f7; --fg: #18181b; --muted: #52525b;
     --card: rgba(255, 255, 255, .86); --field: #fff; --tile: rgba(24, 24, 27, .03); --tile-hi: rgba(37, 99, 235, .09);
@@ -30,6 +31,19 @@
     --c-a: #2563eb; --c-b: #7c3aed; --c-c: #d97706; --c-d: #059669; --c-e: #64748b;
     --shadow: 0 1px 2px rgba(24, 24, 27, .06), 0 10px 28px rgba(24, 24, 27, .07);
   }
+}
+/* Manual toggle (apps/web/src/layouts/Base.astro): an explicit choice always wins over the OS preference above. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f5f7; --fg: #18181b; --muted: #52525b;
+  --card: rgba(255, 255, 255, .86); --field: #fff; --tile: rgba(24, 24, 27, .03); --tile-hi: rgba(37, 99, 235, .09);
+  --line: #e4e4e7; --line-strong: #c4c4cc;
+  --brand: #1d4ed8; --accent: #2563eb; --focus: #1d4ed8; --ring: rgba(37, 99, 235, .22);
+  --primary: #1d4ed8; --primary-hover: #1e40af;
+  --good: #047857; --warn: #92400e; --bad: #b91c1c;
+  --glow: rgba(37, 99, 235, .10);
+  --c-a: #2563eb; --c-b: #7c3aed; --c-c: #d97706; --c-d: #059669; --c-e: #64748b;
+  --shadow: 0 1px 2px rgba(24, 24, 27, .06), 0 10px 28px rgba(24, 24, 27, .07);
 }
 
 * { box-sizing: border-box; }
@@ -59,6 +73,24 @@ nav.main { display: flex; flex-wrap: wrap; gap: 4px; }
 nav.main a { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 12px; border-radius: 999px; border: 1px solid transparent; color: var(--muted); font-size: 14px; font-weight: 600; text-decoration: none; transition: all .2s; }
 nav.main a:hover { color: var(--fg); background: var(--tile); border-color: var(--line); }
 nav.main a[aria-current="page"] { color: var(--fg); background: var(--tile-hi); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.header-controls { display: flex; align-items: center; gap: 8px; }
+
+/* Theme toggle: fixed 44x44 box, both icons always occupy the same slot (position: absolute), so
+   swapping which one is visible never changes the button's size and can never shift layout (CLS). */
+.theme-toggle { position: relative; flex: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--tile); color: var(--fg); cursor: pointer; outline: 2px solid transparent; outline-offset: 2px; transition: border-color .2s, background-color .2s; }
+.theme-toggle:hover { border-color: var(--accent); background: var(--tile-hi); }
+.theme-toggle:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
+.theme-toggle .i-sun, .theme-toggle .i-moon { grid-area: 1 / 1; display: grid; place-items: center; transition: opacity .2s, transform .2s; }
+@media (prefers-reduced-motion: reduce) { .theme-toggle .i-sun, .theme-toggle .i-moon { transition: none; } }
+.theme-toggle .i-moon { opacity: 0; transform: scale(.5) rotate(-30deg); }
+.theme-toggle .i-sun { opacity: 1; transform: scale(1) rotate(0); }
+/* Light theme (OS preference, unless an explicit dark choice overrides it, or an explicit light choice): show the moon (click to go dark). */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .theme-toggle .i-sun { opacity: 0; transform: scale(.5) rotate(30deg); }
+  :root:not([data-theme="dark"]) .theme-toggle .i-moon { opacity: 1; transform: scale(1) rotate(0); }
+}
+:root[data-theme="light"] .theme-toggle .i-sun { opacity: 0; transform: scale(.5) rotate(30deg); }
+:root[data-theme="light"] .theme-toggle .i-moon { opacity: 1; transform: scale(1) rotate(0); }
 footer.site { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); margin-top: 56px; padding-top: 22px; padding-bottom: 32px; }
 footer.site a { color: var(--muted); }
 footer.site a:hover { color: var(--fg); }
