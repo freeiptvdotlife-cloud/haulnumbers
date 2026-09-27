@@ -1,0 +1,21 @@
+---
+import type { Source } from "../data/site";
+
+interface Props {
+  sources: Source[];
+}
+---
+
+<section class="sources" aria-labelledby="sources-heading">
+  <h2 id="sources-heading">Sources</h2>
+  <ol>
+    {Astro.props.sources.map((s) => (
+      <li>
+        <a href={s.url} rel="nofollow noopener" target="_blank">
+          {s.title}
+        </a>{" "}
+        <span class="sources__date">(accessed {s.accessed})</span>
+      </li>
+    ))}
+  </ol>
+</section>

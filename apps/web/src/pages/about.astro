@@ -1,8 +1,31 @@
 ---
 import Base from "../layouts/Base.astro";
+import { AUTHOR, PUBLISHER_BRAND } from "../data/site";
 ---
-<Base title="About Haul Numbers" description="Haul Numbers builds free, accurate calculators for owner-operator truck drivers.">
+<Base title="About Haul Numbers" description="Haul Numbers builds free, accurate calculators for owner-operator truck drivers, published by sahamo.">
   <h1>About Haul Numbers</h1>
   <p>Haul Numbers makes free calculators for owner-operator truck drivers and small fleets. Every formula is documented on its page so you can check the math, and all calculations run in your browser.</p>
   <p>Results are estimates based on the numbers you enter. They are not financial, tax or legal advice.</p>
+
+  <h2>Who writes this</h2>
+  <p>Haul Numbers is published by <strong>{PUBLISHER_BRAND}</strong>, which also runs Funding
+  Numbers, Rental Numbers, Freelance Numbers, Debt Numbers and Settlement Numbers — each a
+  focused set of calculators for one audience, not a single do-everything site.</p>
+  <p><strong>{AUTHOR.name}</strong>, {AUTHOR.role.toLowerCase()}. {AUTHOR.bio}</p>
+
+  <h2>How this site is edited</h2>
+  <p>Every calculator's formula is documented on its own page. Guides that cite outside figures
+  list their sources and the date they were last checked, shown at the top of the guide.</p>
+  <p>Some guide drafts are prepared with AI assistance from official sources — never from memory —
+  and every draft is reviewed, edited and approved by {AUTHOR.name} before it's published. A guide
+  that used AI assistance says so, next to its sources.</p>
+  <p>We rely first on primary sources: government agencies (the IRS, the SBA and others) and the
+  regulations they publish. Where a primary source isn't available yet, we say so and use a
+  reputable secondary one instead.</p>
+
+  <h2>Independence and corrections</h2>
+  <p>This site is funded by advertising. Advertisers have no influence over the calculators'
+  formulas or a guide's content, and we don't accept payment to feature or rank any product.</p>
+  <p>If something looks wrong, <a href="/contact/">tell us which page and what you expected</a> —
+  we check it against the source and correct confirmed errors promptly.</p>
 </Base>

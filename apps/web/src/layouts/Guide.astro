@@ -1,6 +1,7 @@
 ---
 import Base from "./Base.astro";
 import AdSlot from "../components/AdSlot.astro";
+import SourcesList from "../components/SourcesList.astro";
 import { GUIDES } from "../data/guides";
 import { TOOLS } from "../data/tools";
 import { SITE_URL } from "../data/site";
@@ -40,11 +41,17 @@ const jsonLd = [
   <nav class="crumbs" aria-label="Breadcrumb"><a href="/guides/">Guides</a> <span aria-hidden="true">›</span> <span>{guide.title}</span></nav>
   <article class="article">
     <h1>{guide.title}</h1>
-    <p class="meta">Updated {guide.updated}. Figures in examples are illustrative, not typical costs.</p>
+    <p class="meta">
+      Updated {guide.updated}.
+      {guide.reviewed && <> Reviewed against its sources {guide.reviewed}.</>}
+      {" "}Figures in examples are illustrative, not typical costs.
+    </p>
     <slot />
   </article>
 
   <AdSlot page="guide" />
+
+  {guide.sources && guide.sources.length > 0 && <SourcesList sources={guide.sources} />}
 
   <section>
     <h2>Related calculators</h2>

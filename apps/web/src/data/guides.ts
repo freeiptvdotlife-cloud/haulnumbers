@@ -1,3 +1,5 @@
+import type { Source } from "./site";
+
 /** The guides. The index page, nav, related links and sitemap all read this list. */
 export interface Guide {
   slug: string;
@@ -5,6 +7,14 @@ export interface Guide {
   description: string;
   /** ISO date of the last substantive review. Bump it when the content or its sources change. */
   updated: string;
+  /**
+   * ISO date the content was last checked against `sources` below. Optional for now: existing
+   * guides don't have sourced content yet (that backfill is Phase 1 of the content pipeline
+   * build, docs/strategy/04-content-pipeline.md section 11) — this just adds the capability.
+   */
+  reviewed?: string;
+  /** Official sources the guide cites. Optional for the same reason as `reviewed`. */
+  sources?: Source[];
   /** Calculator pages this guide should link to. */
   tools: string[];
 }
