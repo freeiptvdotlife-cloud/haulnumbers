@@ -3,6 +3,7 @@ import "../styles/theme.css";
 import "../styles/tool.css";
 import Icon from "../components/Icon.astro";
 import { TOOLS } from "../data/tools";
+import { SITE_NAME } from "../data/site";
 interface Props {
   title: string;
   description: string;
@@ -28,6 +29,7 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/rss+xml" title={`${SITE_NAME} guides`} href="/rss.xml" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="theme-color" content="#09090b" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

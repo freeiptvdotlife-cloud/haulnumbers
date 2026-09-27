@@ -13,6 +13,7 @@
     "digest": "node scripts/digest/run.mjs"
   },
   "dependencies": {
+    "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
     "@haulnumbers/core": "*",
     "astro": "^7.3.3"

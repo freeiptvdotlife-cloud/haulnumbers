@@ -2,9 +2,14 @@ name: Daily digest
 
 # Drafts one trucking digest a day with Cloudflare Workers AI and opens a pull request.
 # Merging the PR is the editorial review and publishes the post (the site deploys on merge).
+#
+# Cron trigger paused as of the content pipeline's Phase 1 (docs/strategy/04-content-pipeline.md,
+# section 11): this pulls from news RSS feeds (Land Line, FreightWaves, etc.), not official
+# sources, and sahamo-pipeline's Phase 2 is building the hash-watch mechanism official sources
+# actually need (they're static pages with occasional value changes, not RSS feeds of dated
+# articles) once, centrally, for all six sites. Building that twice here would duplicate it.
+# Still runnable by hand via workflow_dispatch; revisit once sahamo-pipeline Phase 2 exists.
 on:
-  schedule:
-    - cron: "17 11 * * *"
   workflow_dispatch:
 
 permissions:
