@@ -21,6 +21,18 @@ export interface Guide {
 
 export const GUIDES: readonly Guide[] = [
   {
+    slug: "california-ifta-diesel-tax-rises-to-0-34-gal-for-q4-2026-impact-for-ow",
+    title: "California IFTA Diesel Tax Rises to $0.34/gal for Q4 2026 – Impact for Owner‑Operators",
+    description: "California’s IFTA diesel tax rises to $0.34 per gallon for Q4 2026, up from $0.31. See how it’s calculated, the impact on your filing, and use the free IFTA calculator.",
+    updated: "2026-09-28",
+    reviewed: "2026-09-28",
+    sources: [
+      { title: "IFTA, Inc. fuel tax matrix", url: "https://www.iftach.org/taxmatrix4/Taxmatrix.php", accessed: "2026-09-28" },
+      { title: "West Virginia's instructions for completing the IFTA return", url: "https://tax.wv.gov/Documents/Motorfuel/IFTA/ifta13.instructions.pdf", accessed: "2026-09-28" },
+    ],
+    tools: ["/ifta-calculator/"],
+  },
+  {
     slug: "how-to-calculate-cost-per-mile",
     title: "How to Calculate Cost Per Mile as an Owner-Operator",
     description: "Step-by-step guide to your trucking cost per mile, break-even rate and target rate, with a worked example and the mistakes that make the number wrong.",
