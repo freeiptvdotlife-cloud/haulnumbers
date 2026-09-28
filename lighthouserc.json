@@ -14,7 +14,7 @@
         "/ifta-calculator/index.html",
         "/per-diem-calculator/index.html"
       ],
-      "numberOfRuns": 1
+      "numberOfRuns": 3
     },
     "assert": {
       "assertions": {
