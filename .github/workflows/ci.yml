@@ -57,3 +57,21 @@ jobs:
       - run: npm run build:web
       - name: Lighthouse CI (fails when a budget in lighthouserc.json is missed)
         run: npx --yes @lhci/cli@0.15.x autorun --config=lighthouserc.json
+
+  deploy:
+    name: Deploy to Cloudflare Pages
+    needs: [verify, lighthouse]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: apps/web/dist
+      - name: Deploy (only reached once verify + lighthouse pass on main)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: b9b20bd521eb0c46b313c9dd05a4eeca
+          command: pages deploy apps/web/dist --project-name=haulnumbers --branch=main
