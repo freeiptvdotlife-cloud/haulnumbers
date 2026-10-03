@@ -94,13 +94,13 @@ Done when: the app is live, AdMob serves real ads, `app-ads.txt` verifies, and t
 
 ## 5. After launch
 - Weekly: Search Console (indexing, queries), AdSense policy centre, Play vitals, the freshness workflow.
-- **Every quarter:** IFTA rates (runbook in `docs/06`). **Every October:** IRS per diem notice (runbook in `docs/06`); the current period ends 2026-09-30 and the new notice was not yet published on 2026-09-20.
+- **Every quarter:** IFTA rates (runbook in `docs/06`). **Every October:** IRS per diem notice (runbook in `docs/06`); Notice 2026-60 (FY2026-2027, $80 CONUS / $86 OCONUS) was added 2026-10-03. The data-freshness workflow will flag the gap if a future October notice is missed.
 - Every Expo SDK upgrade: bump React and React Native together (root `overrides`), re-run `npm audit`, and re-verify the accepted advisories in `docs/07`.
 
 ## 6. What was verified locally and what was not
 | Verified in this repository | Not verifiable without accounts or a device |
 |---|---|
-| 286 tests (170 core, 23 compliance-gate, 93 app); typecheck on all three workspaces; web build; compliance gate in ad-free, preview, verification and monetised modes (with fake ids) | AdSense approval and real ad rendering; ads.txt verification by Google |
+| 299 tests (171 core, 35 compliance-gate, 93 app); typecheck on all three workspaces; web build; compliance gate in ad-free, preview, verification and monetised modes (with fake ids) | AdSense approval and real ad rendering; ads.txt verification by Google |
 | Lighthouse and axe on every page; keyboard pass; overflow at five widths | A real screen-reader session |
 | Android **debug and release APKs built and inspected** (`com.haulnumbers.app`, compile and target SDK 36, minimal permissions, no `SYSTEM_ALERT_WINDOW` in release); JS bundle; config guard for production ids | The consent form and ads on a real device; Play data-safety acceptance |
 | CI and freshness workflows parse as valid YAML | Their first run on GitHub |
