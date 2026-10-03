@@ -5,7 +5,7 @@ export interface Faq {
   a: string;
 }
 
-/** WebApplication and FAQPage structured data. Only pass FAQs that are visible on the page. */
+/** WebApplication and BreadcrumbList structured data for calculator pages. */
 export function toolJsonLd(opts: { name: string; path: string; faqs: readonly Faq[] }) {
   return [
     {
@@ -19,12 +19,11 @@ export function toolJsonLd(opts: { name: string; path: string; faqs: readonly Fa
     },
     {
       "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: opts.faqs.map((f) => ({
-        "@type": "Question",
-        name: f.q,
-        acceptedAnswer: { "@type": "Answer", text: f.a },
-      })),
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Calculators", item: `${SITE_URL}/calculators/` },
+        { "@type": "ListItem", position: 2, name: opts.name, item: SITE_URL + opts.path },
+      ],
     },
   ];
 }
