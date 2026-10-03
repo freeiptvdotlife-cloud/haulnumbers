@@ -71,6 +71,8 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
         </button>
       </div>
     </header>
+    <div class="print-header" aria-hidden="true"><strong>Haul Numbers</strong> · haulnumbers.com &nbsp;|&nbsp; <span class="print-date"></span></div>
+    <script is:inline>var _pd=document.querySelector('.print-date');if(_pd)_pd.textContent='Generated: '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});</script>
     <main id="main" tabindex="-1"><slot /></main>
     <footer class="site">
       <p>© {new Date().getFullYear()} Haul Numbers. Estimates only, not financial, tax or legal advice.</p>

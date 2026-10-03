@@ -1,0 +1,26 @@
+---
+interface Props {
+  toolId: string;
+}
+const { toolId } = Astro.props;
+---
+<div class="export-bar">
+  <button type="button" class="btn-export btn-export--pdf">&#8595; Save as PDF</button>
+  <button type="button" class="btn-export btn-export--csv" data-tool-id={toolId}>&#8595; Download CSV</button>
+</div>
+
+<script>
+  import { getExportRows } from "../lib/toolUi";
+  import { buildRowsCsv, csvFilename, downloadCsv } from "../lib/csvExport";
+
+  document.querySelector<HTMLButtonElement>(".btn-export--pdf")?.addEventListener("click", () => {
+    window.print();
+  });
+
+  const csvBtn = document.querySelector<HTMLButtonElement>(".btn-export--csv");
+  csvBtn?.addEventListener("click", () => {
+    const rows = getExportRows();
+    if (!rows) return;
+    downloadCsv(buildRowsCsv(rows), csvFilename("haul", csvBtn.dataset.toolId ?? "haul"));
+  });
+</script>

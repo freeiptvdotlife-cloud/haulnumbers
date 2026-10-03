@@ -99,3 +99,25 @@ summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; bo
 .article th, .article td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); }
 .article thead th { background: var(--tile); font-size: 13px; color: var(--muted); }
 .article td.num, .article th.num { text-align: right; }
+
+/* Export bar */
+.export-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+.btn-export { font: inherit; font-weight: 650; font-size: 13px; min-height: 40px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line-strong); background: var(--tile); color: var(--fg); cursor: pointer; outline: 2px solid transparent; outline-offset: 2px; transition: all .2s; }
+.btn-export:hover { background: var(--tile-hi); border-color: var(--accent); }
+.btn-export:active { transform: translateY(1px); }
+.btn-export:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
+.btn-export--csv { border-color: var(--accent); color: var(--accent); }
+.btn-export--csv:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+
+/* Print header (hidden on screen, shown when printing) */
+.print-header { display: none; }
+
+@media print {
+  .site, .site-nav, footer, .skip, .export-bar, .ad-slot, #theme-toggle, .btn-export { display: none !important; }
+  .print-header { display: block; font-size: 12px; color: #555; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #ccc; }
+  body { background: #fff; color: #000; }
+  .card { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+  .workspace, .two-col { display: block !important; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #ccc; padding: 4px 8px; font-size: 12px; }
+}

@@ -1,4 +1,5 @@
 ---
+import ExportBar from "./ExportBar.astro";
 /**
  * The live results area. Scripts fill #err, #banner and whatever the page puts in the slot.
  * `minHeight` reserves the space up front so results appearing never push the content below
@@ -9,8 +10,10 @@ interface Props {
   minHeight?: string;
   /** Reserve and render the proportion-gauge container (#gauge). */
   gauge?: boolean;
+  /** When set, renders PDF + CSV export buttons below the results. */
+  toolId?: string;
 }
-const { title = "Your results", minHeight = "22rem", gauge = false } = Astro.props;
+const { title = "Your results", minHeight = "22rem", gauge = false, toolId } = Astro.props;
 ---
 <section class="card result" aria-live="polite" aria-labelledby="res-h" style={`--result-min:${minHeight}`}>
   <h2 id="res-h">{title}</h2>
@@ -20,4 +23,5 @@ const { title = "Your results", minHeight = "22rem", gauge = false } = Astro.pro
   <slot />
   {gauge && <div id="gauge" class="gauge"></div>}
   <p class="disclaimer">Estimate only, not financial, tax or legal advice. Check your own figures and contracts before relying on it.</p>
+  {toolId && <ExportBar toolId={toolId} />}
 </section>
