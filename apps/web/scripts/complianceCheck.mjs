@@ -4,7 +4,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
 /** The only pages allowed to carry ads: pages whose main content is the calculator plus its explanation. */
-export const AD_PAGES = ["cost-per-mile-calculator", "load-profit-calculator", "detention-pay-calculator", "ifta-calculator", "per-diem-calculator"];
+export const AD_PAGES = ["cost-per-mile-calculator", "load-profit-calculator", "detention-pay-calculator", "ifta-calculator", "per-diem-calculator", "freight-factoring-calculator"];
 /** Guide articles are content pages too (ads allowed), but the guides index is a listing, so it is not. */
 export const isAdPage = (key) => AD_PAGES.includes(key) || (key.startsWith("guides/") && key.length > "guides/".length);
 /** Pages every site needs; none of them may ever carry ads (no ads on non-content pages). */

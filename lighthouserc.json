@@ -12,7 +12,8 @@
         "/load-profit-calculator/index.html",
         "/detention-pay-calculator/index.html",
         "/ifta-calculator/index.html",
-        "/per-diem-calculator/index.html"
+        "/per-diem-calculator/index.html",
+        "/freight-factoring-calculator/index.html"
       ],
       "numberOfRuns": 3
     },

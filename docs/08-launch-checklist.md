@@ -59,7 +59,7 @@ Done when: Search Console reports the pages as indexed.
 3. **Check locally first:** with the same variables set, `npm run build:web && npm run check:compliance` must print `Compliance check passed (monetised build).`
 4. Wait for approval. If AdSense rejects the site, read the reason, fix the content (not the wording of the application), and re-apply. Common reasons: low-value content, missing pages, navigation problems.
 5. **After approval** create six responsive display ad units (one per calculator plus one shared by all guides) and set in Pages Production:
-   - `PUBLIC_ADSENSE_SLOT_CPM`, `PUBLIC_ADSENSE_SLOT_LOAD`, `PUBLIC_ADSENSE_SLOT_DETENTION`, `PUBLIC_ADSENSE_SLOT_IFTA`, `PUBLIC_ADSENSE_SLOT_PERDIEM`, `PUBLIC_ADSENSE_SLOT_GUIDE`
+   - `PUBLIC_ADSENSE_SLOT_CPM`, `PUBLIC_ADSENSE_SLOT_LOAD`, `PUBLIC_ADSENSE_SLOT_DETENTION`, `PUBLIC_ADSENSE_SLOT_IFTA`, `PUBLIC_ADSENSE_SLOT_PERDIEM`, `PUBLIC_ADSENSE_SLOT_GUIDE`, `PUBLIC_ADSENSE_SLOT_FACTORING`
    - **remove** `PUBLIC_ADSENSE_VERIFY_ONLY`
 6. **Turn Auto ads off** in AdSense. We place ads manually; Auto ads could place them on pages that must stay ad-free. (The AdSense loader is only ever included on the ten content pages by design.)
 7. In AdSense **Privacy & messaging**, create the European regulations message using a **Google-certified CMP with TCF v2.3** support, and publish it. Check whether users need a persistent "Privacy settings" link to change their choice (**verify**); add it to the footer if so.

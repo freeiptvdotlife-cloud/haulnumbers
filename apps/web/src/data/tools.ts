@@ -18,12 +18,13 @@ export interface Tool {
   guide?: string;
 }
 
-export type ToolGroupId = "price" | "paid" | "taxes";
+export type ToolGroupId = "price" | "paid" | "taxes" | "finance";
 
 export const TOOL_GROUPS: readonly { id: ToolGroupId; title: string; intro: string }[] = [
   { id: "price", title: "Price the load", intro: "Know your costs and your real profit before you say yes to a load." },
   { id: "paid", title: "Get paid what you are owed", intro: "Turn waiting time into an invoice line." },
   { id: "taxes", title: "Taxes and paperwork", intro: "Estimate fuel tax and deductions before you file." },
+  { id: "finance", title: "Financing and cash flow", intro: "Understand the real cost of getting paid early." },
 ];
 
 export const TOOLS: readonly Tool[] = [
@@ -32,4 +33,5 @@ export const TOOLS: readonly Tool[] = [
   { path: "/detention-pay-calculator/", icon: "clock", name: "Detention pay calculator", navLabel: "Detention pay", blurb: "Work out what you are owed for waiting past free time, including waits past midnight.", group: "paid", useWhen: "Use it when a shipper or receiver keeps you waiting, to know what to invoice.", guide: "/guides/detention-pay-guide/" },
   { path: "/ifta-calculator/", icon: "fuel", name: "IFTA fuel tax calculator", navLabel: "IFTA", blurb: "Estimate your quarterly diesel fuel tax by state, using the official IFTA rates.", group: "taxes", useWhen: "Use it near the end of each quarter to estimate what you will owe, or get back, before you file.", guide: "/guides/ifta-explained/" },
   { path: "/per-diem-calculator/", icon: "calendar", name: "Per diem calculator", navLabel: "Per diem", blurb: "Estimate your meal per diem deduction using the IRS special rate for truckers.", group: "taxes", useWhen: "Use it at tax time, or through the year, to see what your days away from home are worth as a deduction.", guide: "/guides/trucker-per-diem-guide/" },
+  { path: "/freight-factoring-calculator/", icon: "dollar", name: "Freight factoring calculator", navLabel: "Factoring", blurb: "See your advance, fee and reserve release, plus the annualised cost of factoring versus waiting.", group: "finance", useWhen: "Use it when a factoring company quotes you a rate, to see the real annual cost and compare it with a credit line." },
 ];
