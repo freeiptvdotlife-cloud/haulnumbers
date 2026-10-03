@@ -122,6 +122,11 @@ export const GUIDES: readonly Guide[] = [
         url: "https://www.irs.gov/pub/irs-drop/n-25-54.pdf",
         accessed: "2026-09-27",
       },
+      {
+        title: "IRS Notice 2026-60, 2026-2027 Special Per Diem Rates",
+        url: "https://www.irs.gov/pub/irs-drop/n-26-60.pdf",
+        accessed: "2026-10-03",
+      },
     ],
     tools: ["/per-diem-calculator/"],
   },
