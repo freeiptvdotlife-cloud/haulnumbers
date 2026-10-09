@@ -22,7 +22,7 @@
  *  - only put slots on pages with real publisher content, never on non-content pages.
  * `scripts/check-compliance.mjs` enforces placement, labelling and configuration on the built site.
  */
-type AdPage = "cpm" | "load" | "detention" | "ifta" | "perdiem" | "guide" | "factoring";
+type AdPage = "cpm" | "load" | "detention" | "ifta" | "perdiem" | "guide" | "factoring" | "truck-loan";
 interface Props {
   page: AdPage;
   minHeight?: number;
@@ -36,6 +36,7 @@ const slots: Record<AdPage, string | undefined> = {
   perdiem: import.meta.env.PUBLIC_ADSENSE_SLOT_PERDIEM,
   guide: import.meta.env.PUBLIC_ADSENSE_SLOT_GUIDE,
   factoring: import.meta.env.PUBLIC_ADSENSE_SLOT_FACTORING,
+  "truck-loan": import.meta.env.PUBLIC_ADSENSE_SLOT_TRUCK_LOAN,
 };
 const client = import.meta.env.PUBLIC_ADSENSE_CLIENT;
 const slot = slots[page];
