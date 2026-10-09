@@ -14,9 +14,9 @@ export const PUBLISHER_BRAND = "sahamo";
  * need for a second, parallel launch guard.
  */
 export const AUTHOR = {
-  name: "Alex Morgan",
+  name: "Nabil Fao",
   role: "Editor",
-  bio: "Alex Morgan builds and maintains the calculators published under sahamo — tools that turn official IRS, SBA, HUD and state-agency numbers into plain answers for truckers, landlords, freelancers, small business owners and anyone navigating debt or a settlement. Every figure is checked against its source before publishing, and each guide shows the date it was last reviewed against that source.",
+  bio: "Nabil Fao builds and maintains the calculators published under sahamo — tools that turn official IRS, SBA, HUD and state-agency numbers into plain answers for truckers, landlords, freelancers, small business owners and anyone navigating debt or a settlement. Every figure is checked against its source before publishing, and each guide shows the date it was last reviewed against that source.",
 };
 
 export interface Source {
