@@ -25,7 +25,7 @@ Use this to test the real site on the internet before the domain exists. **Trade
 Caveats: the staging URL is public (anyone with the link can open it), just not indexed; Cloudflare's limits are 20,000 files and 25 MiB per file, which this site is far below.
 
 ## 1. Domain, hosting and email
-1. **You:** buy `haulnumbers.com` (re-check availability first; it was unregistered on 2026-09-19). Turn on auto-renew, registrar lock and two-factor sign-in.
+1. **You:** buy `truckernumbers.com` (re-check availability first; it was unregistered on 2026-09-19). Turn on auto-renew, registrar lock and two-factor sign-in.
 2. **You:** create a free Cloudflare account and add the domain (change the nameservers at the registrar).
 3. **You:** create a Cloudflare Pages project from the GitHub repository.
    - Build command: `npm ci && npm run build:web`
@@ -33,14 +33,14 @@ Caveats: the staging URL is public (anyone with the link can open it), just not 
    - Environment variable `NODE_VERSION` = `22`
    - **Preview environment only:** `PUBLIC_NOINDEX` = `1` (so preview copies are never indexed; the compliance gate rejects `noindex` in a monetised build).
 4. **You:** attach the custom domain to the Pages project; add a redirect from `www` to the apex domain; enable "Always use HTTPS".
-5. **You:** turn on Cloudflare Email Routing and create a public address such as `contact@haulnumbers.com` that forwards to your inbox.
+5. **You:** turn on Cloudflare Email Routing and create a public address such as `contact@truckernumbers.com` that forwards to your inbox.
 6. **You:** in the Pages **Production** environment set `PUBLIC_CONTACT_EMAIL` to that address, redeploy.
 
-Done when: `https://haulnumbers.com/` loads, `/contact/` shows the address, `/robots.txt` and `/sitemap-index.xml` load, and the security headers from `apps/web/public/_headers` appear (`curl -I https://haulnumbers.com/` shows `x-content-type-options: nosniff`).
+Done when: `https://truckernumbers.com/` loads, `/contact/` shows the address, `/robots.txt` and `/sitemap-index.xml` load, and the security headers from `apps/web/public/_headers` appear (`curl -I https://truckernumbers.com/` shows `x-content-type-options: nosniff`).
 
 ## 2. Search Console and indexing
 1. **You:** add a **Domain property** in Google Search Console and verify it with the DNS TXT record it shows.
-2. **You:** submit `https://haulnumbers.com/sitemap-index.xml`.
+2. **You:** submit `https://truckernumbers.com/sitemap-index.xml`.
 3. **You:** use URL Inspection, then "Request indexing", for the home page, `/calculators/`, `/guides/` and the ten calculator and guide pages (there is a daily quota; spread it over a few days).
 4. Track queries and positions weekly in `docs/seo-tracker.csv`. Expect weeks before competitive terms move.
 Done when: Search Console reports the pages as indexed.
@@ -48,7 +48,7 @@ Done when: Search Console reports the pages as indexed.
 ## 3. AdSense
 **Prerequisite:** the site is live, has been crawled, and has real content (five calculators and five 1,000-word guides are in place). Approval is not guaranteed.
 
-1. **You:** sign up for AdSense and add `haulnumbers.com`.
+1. **You:** sign up for AdSense and add `truckernumbers.com`.
 2. **Verification stage.** AdSense asks you to prove ownership before it gives you ad units. Copy your publisher id (`ca-pub-…`) and deploy a verification build by setting, in Pages **Production**:
    - `PUBLIC_ADSENSE_CLIENT` = your `ca-pub-…` id
    - `PUBLIC_ADSENSE_VERIFY_ONLY` = `1`
@@ -59,7 +59,7 @@ Done when: Search Console reports the pages as indexed.
 3. **Check locally first:** with the same variables set, `npm run build:web && npm run check:compliance` must print `Compliance check passed (monetised build).`
 4. Wait for approval. If AdSense rejects the site, read the reason, fix the content (not the wording of the application), and re-apply. Common reasons: low-value content, missing pages, navigation problems.
 5. **After approval** create six responsive display ad units (one per calculator plus one shared by all guides) and set in Pages Production:
-   - `PUBLIC_ADSENSE_SLOT_CPM`, `PUBLIC_ADSENSE_SLOT_LOAD`, `PUBLIC_ADSENSE_SLOT_DETENTION`, `PUBLIC_ADSENSE_SLOT_IFTA`, `PUBLIC_ADSENSE_SLOT_PERDIEM`, `PUBLIC_ADSENSE_SLOT_GUIDE`
+   - `PUBLIC_ADSENSE_SLOT_CPM`, `PUBLIC_ADSENSE_SLOT_LOAD`, `PUBLIC_ADSENSE_SLOT_DETENTION`, `PUBLIC_ADSENSE_SLOT_IFTA`, `PUBLIC_ADSENSE_SLOT_PERDIEM`, `PUBLIC_ADSENSE_SLOT_GUIDE`, `PUBLIC_ADSENSE_SLOT_FACTORING`
    - **remove** `PUBLIC_ADSENSE_VERIFY_ONLY`
 6. **Turn Auto ads off** in AdSense. We place ads manually; Auto ads could place them on pages that must stay ad-free. (The AdSense loader is only ever included on the ten content pages by design.)
 7. In AdSense **Privacy & messaging**, create the European regulations message using a **Google-certified CMP with TCF v2.3** support, and publish it. Check whether users need a persistent "Privacy settings" link to change their choice (**verify**); add it to the footer if so.
@@ -83,7 +83,7 @@ On a slow connection the first build can take one to two hours (the release buil
 
 ### 4.3 Google Play Console
 1. **You:** create the app in Play Console with your existing developer account.
-2. Complete the listing from `docs/store/listing.md`, the content rating, target audience (**18+**), the ads declaration (the app contains ads), the data safety form and the advertising-ID declaration. Privacy policy URL: `https://haulnumbers.com/privacy/`.
+2. Complete the listing from `docs/store/listing.md`, the content rating, target audience (**18+**), the ads declaration (the app contains ads), the data safety form and the advertising-ID declaration. Privacy policy URL: `https://truckernumbers.com/privacy/`.
 3. **Signing.** Use Play App Signing. The simplest supported path is Expo's EAS Build, which manages the upload keystore: `npx eas-cli build --platform android --profile production` (needs a free Expo account; **verify** the current EAS Build free-tier limits). If you build locally instead, generate an upload key with `keytool -genkeypair -v -storetype PKCS12 -keystore upload.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000`, keep it **outside the repository** (`*.jks` and `*.keystore` are git-ignored), and back it up; losing it is painful.
 4. **Internal / closed testing builds show Google's TEST ads.** Build with `ADMOB_USE_TEST_IDS=true`. Upload the AAB to the internal track first.
 5. **Closed-testing requirement.** If your developer account is a **personal account created after 2023-11-13**, Google requires a closed test with **12 testers opted in continuously for 14 days** before you can apply for production access. Organisation accounts and older personal accounts are exempt. Check your account's date and type, and recruit 15-20 testers if needed (the clock is per tester).
@@ -94,13 +94,13 @@ Done when: the app is live, AdMob serves real ads, `app-ads.txt` verifies, and t
 
 ## 5. After launch
 - Weekly: Search Console (indexing, queries), AdSense policy centre, Play vitals, the freshness workflow.
-- **Every quarter:** IFTA rates (runbook in `docs/06`). **Every October:** IRS per diem notice (runbook in `docs/06`); the current period ends 2026-09-30 and the new notice was not yet published on 2026-09-20.
+- **Every quarter:** IFTA rates (runbook in `docs/06`). **Every October:** IRS per diem notice (runbook in `docs/06`); Notice 2026-60 (FY2026-2027, $80 CONUS / $86 OCONUS) was added 2026-10-03. The data-freshness workflow will flag the gap if a future October notice is missed.
 - Every Expo SDK upgrade: bump React and React Native together (root `overrides`), re-run `npm audit`, and re-verify the accepted advisories in `docs/07`.
 
 ## 6. What was verified locally and what was not
 | Verified in this repository | Not verifiable without accounts or a device |
 |---|---|
-| 286 tests (170 core, 23 compliance-gate, 93 app); typecheck on all three workspaces; web build; compliance gate in ad-free, preview, verification and monetised modes (with fake ids) | AdSense approval and real ad rendering; ads.txt verification by Google |
+| 299 tests (171 core, 35 compliance-gate, 93 app); typecheck on all three workspaces; web build; compliance gate in ad-free, preview, verification and monetised modes (with fake ids) | AdSense approval and real ad rendering; ads.txt verification by Google |
 | Lighthouse and axe on every page; keyboard pass; overflow at five widths | A real screen-reader session |
 | Android **debug and release APKs built and inspected** (`com.haulnumbers.app`, compile and target SDK 36, minimal permissions, no `SYSTEM_ALERT_WINDOW` in release); JS bundle; config guard for production ids | The consent form and ads on a real device; Play data-safety acceptance |
 | CI and freshness workflows parse as valid YAML | Their first run on GitHub |

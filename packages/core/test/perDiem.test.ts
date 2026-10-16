@@ -127,7 +127,7 @@ describe("IRS per diem data", () => {
   });
 
   it("lists periods newest first and returns undefined for unknown ones", () => {
-    expect(listPerDiemPeriods()[0]).toBe("2025-2026");
+    expect(listPerDiemPeriods()[0]).toBe("2026-2027");
     expect(getPerDiemTable("nope")).toBeUndefined();
   });
 

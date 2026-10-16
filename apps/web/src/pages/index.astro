@@ -6,9 +6,12 @@ import { SITE_URL } from "../data/site";
 import { GUIDES } from "../data/guides";
 ---
 <Base
-  title="Haul Numbers: Free Calculators for Owner-Operator Truckers"
+  title="Trucker Numbers: Free Calculators for Owner-Operator Truckers"
   description="Free trucking calculators for owner-operators: cost per mile, load profit with deadhead, detention pay, IFTA fuel tax, per diem, and more. Know your numbers before you take the load."
-  jsonLd={{ "@context": "https://schema.org", "@type": "WebSite", name: "Haul Numbers", url: `${SITE_URL}/` }}
+  jsonLd={[
+    { "@context": "https://schema.org", "@type": "WebSite", name: "Trucker Numbers", url: `${SITE_URL}/` },
+    { "@context": "https://schema.org", "@type": "Organization", name: "Trucker Numbers", url: `${SITE_URL}/` },
+  ]}
 >
   <h1>Know your numbers before you take the load</h1>
   <p>Free, fast calculators built for owner-operators. No sign-up, and your figures never leave your device.</p>

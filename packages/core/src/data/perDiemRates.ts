@@ -1,4 +1,5 @@
 import p2025 from "./perDiem/2025-2026.json";
+import p2026 from "./perDiem/2026-2027.json";
 
 /**
  * IRS special M&IE per diem rates for the transportation industry, one file per federal fiscal
@@ -19,7 +20,7 @@ export interface PerDiemTable {
   transportation: { conus: number; oconus: number };
 }
 
-export const PER_DIEM_TABLES: readonly PerDiemTable[] = [p2025] as PerDiemTable[];
+export const PER_DIEM_TABLES: readonly PerDiemTable[] = [p2026, p2025] as PerDiemTable[];
 
 export function getPerDiemTable(period: string): PerDiemTable | undefined {
   return PER_DIEM_TABLES.find((t) => t.period === period);

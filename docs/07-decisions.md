@@ -5,7 +5,7 @@ Format: ADR-nnn · status · decision · why · trade-off. Add a new entry inste
 ## ADR-001 · Niche: owner-operator trucking suite · accepted
 Chosen over trades/construction calculators. Small independent tool sites rank in trucking, ad value is high, drivers are phone-first (natural web + app pairing), and IFTA rate data provides a freshness moat. Trade-off: smaller audience; volume unverified (validate in Phase 1–2).
 
-## ADR-002 · Domain `haulnumbers.com` · proposed (not yet purchased)
+## ADR-002 · Domain `truckernumbers.com` · proposed (not yet purchased)
 Available per Verisign RDAP on 2026-09-19 (snapshot only). Short, brandable, not confusable with truckcalcs.com / truckercalc.com, room to expand beyond one tool. Backups: `truckingcalcs.com`, `loadprofitcalc.com`, `dieselmath.com`. Trade-off: weaker exact-match keyword signal, which matters little versus content and links.
 
 ## ADR-003 · One TypeScript core shared by web and Android (Expo) · accepted

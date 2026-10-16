@@ -1,0 +1,10 @@
+{
+  "period": "2026-2027",
+  "effectiveFrom": "2026-10-01",
+  "effectiveThrough": "2027-09-30",
+  "notice": "Notice 2026-60",
+  "source": "IRS Notice 2026-60, section 3: special M&IE rates for the transportation industry",
+  "sourceUrl": "https://www.irs.gov/pub/irs-drop/n-26-60.pdf",
+  "retrievedAt": "2026-10-03",
+  "transportation": { "conus": 80, "oconus": 86 }
+}

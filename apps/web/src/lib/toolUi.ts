@@ -39,8 +39,14 @@ export function hideErrors(err: HTMLElement): void {
   err.hidden = true;
 }
 
+let _exportRows: Row[] | null = null;
+
+/** Returns the rows from the most recent successful renderRows call, for CSV export. */
+export const getExportRows = (): Row[] | null => _exportRows;
+
 /** Fills a <dl> with metric tiles (icon + label + value); `big` rows get the headline style. */
 export function renderRows(dl: HTMLElement, rows: Row[]): void {
+  _exportRows = rows;
   for (const [label, value, big] of rows) {
     const tile = document.createElement("div");
     tile.className = big ? "metric big" : "metric";

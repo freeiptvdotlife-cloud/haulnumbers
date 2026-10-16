@@ -6,7 +6,7 @@ import { SITE_NAME } from "../data/site";
 export function GET(context: APIContext) {
   return rss({
     title: `${SITE_NAME} guides`,
-    description: "Guides on trucking costs, taxes and pay, from Haul Numbers.",
+    description: "Guides on trucking costs, taxes and pay, from Trucker Numbers.",
     site: context.site!,
     items: GUIDES.map((g) => ({
       title: g.title,

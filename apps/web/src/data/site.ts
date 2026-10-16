@@ -1,9 +1,9 @@
 /** The public address of this build. Staging builds set PUBLIC_SITE_URL; production uses the real domain. */
-export const SITE_URL: string = (import.meta.env.PUBLIC_SITE_URL || "https://haulnumbers.com").replace(/\/+$/, "");
+export const SITE_URL: string = (import.meta.env.PUBLIC_SITE_URL || "https://truckernumbers.com").replace(/\/+$/, "");
 
-export const SITE_NAME = "Haul Numbers";
+export const SITE_NAME = "Trucker Numbers";
 
-/** The publisher of record across the sahamo portfolio (haulnumbers.com, funding-numbers.com, etc). */
+/** The publisher of record across the sahamo portfolio (truckernumbers.com, mainstreetnumbers.com, etc). */
 export const PUBLISHER_BRAND = "sahamo";
 
 /**
@@ -14,9 +14,9 @@ export const PUBLISHER_BRAND = "sahamo";
  * need for a second, parallel launch guard.
  */
 export const AUTHOR = {
-  name: "Alex Morgan",
+  name: "Nabil Fao",
   role: "Editor",
-  bio: "Alex Morgan builds and maintains the calculators published under sahamo — tools that turn official IRS, SBA, HUD and state-agency numbers into plain answers for truckers, landlords, freelancers, small business owners and anyone navigating debt or a settlement. Every figure is checked against its source before publishing, and each guide shows the date it was last reviewed against that source.",
+  bio: "Nabil Fao builds and maintains the calculators published under sahamo — tools that turn official IRS, SBA, HUD and state-agency numbers into plain answers for truckers, landlords, freelancers, small business owners and anyone navigating debt or a settlement. Every figure is checked against its source before publishing, and each guide shows the date it was last reviewed against that source.",
 };
 
 export interface Source {

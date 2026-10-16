@@ -17,7 +17,6 @@ const quarters = listIftaQuarters().map((q) => {
   return { value: q, label: `${q.slice(0, 4)} Q${q.slice(5)}${t.status === "preliminary" ? " (preliminary)" : ""}` };
 });
 const newestFinal = IFTA_RATE_TABLES.filter((t) => t.status === "final").map((t) => t.quarter).sort().reverse()[0];
-const latestRetrieved = IFTA_RATE_TABLES.map((t) => t.retrievedAt).sort().reverse()[0];
 
 const faqs = [
   { q: "What is an IFTA fuel tax return?", a: "IFTA (the International Fuel Tax Agreement) lets a carrier file one quarterly return with its base state instead of paying fuel tax to every state it drives through. The return works out the tax owed to each state from the miles driven there, and credits the tax already paid at the pump." },
@@ -56,7 +55,7 @@ const faqs = [
 
   <template id="row-tpl"><IftaRow /></template>
 
-  <ResultPanel title="Your estimate" minHeight="30rem">
+  <ResultPanel title="Your estimate" minHeight="30rem" toolId="ifta">
     <dl id="summary"></dl>
     <div class="tablewrap" tabindex="0" role="region" aria-label="Tax by state, scrolls sideways on small screens">
       <table id="detail" hidden>
@@ -66,7 +65,7 @@ const faqs = [
       </table>
     </div>
     <ul id="notes" class="notes"></ul>
-    <p class="source">Rates: <a href="https://www.iftach.org/taxmatrix4/Taxmatrix.php">IFTA, Inc. fuel tax matrix</a>, retrieved {latestRetrieved}. Negative amounts are credits. Interest, penalties, other fuels and Canada are not included.</p>
+    <p id="source-note" class="source"></p>
   </ResultPanel>
 
   <AdSlot page="ifta" />
@@ -139,6 +138,7 @@ const faqs = [
     const table = document.getElementById("detail") as HTMLTableElement;
     const tbody = table.querySelector("tbody") as HTMLElement;
     const notes = document.getElementById("notes") as HTMLElement;
+    const sourceNote = document.getElementById("source-note") as HTMLElement;
     const MAX_ROWS = 48;
 
     const int = (n: number) => n.toLocaleString("en-US");
@@ -159,6 +159,22 @@ const faqs = [
     function syncAddState() { addBtn.disabled = rows().length >= MAX_ROWS; }
 
     function run() {
+      // Per-quarter source attribution; updates whenever the quarter dropdown changes.
+      const qt = getIftaRateTable(quarterEl.value);
+      const qVal = quarterEl.value;
+      const qLabel = qVal.length === 6 ? `${qVal.slice(0, 4)} Q${qVal.slice(5)} ` : "";
+      sourceNote.replaceChildren();
+      if (qt) {
+        const pre = document.createTextNode(`${qLabel}rates: `);
+        const a = document.createElement("a");
+        a.href = qt.sourceUrl;
+        a.textContent = "IFTA, Inc. fuel tax matrix";
+        const post = document.createTextNode(
+          `, last retrieved ${qt.retrievedAt}. Negative amounts are credits. Interest, penalties, other fuels and Canada are not included.`,
+        );
+        sourceNote.append(pre, a, post);
+      }
+
       const used: { el: HTMLElement; index: number }[] = [];
       const jurisdictions = rows().flatMap((el, index) => {
         const code = q(el, "code").value, miles = q(el, "miles").value, ex = q(el, "exemptMiles").value, gal = q(el, "gallons").value;

@@ -1,0 +1,131 @@
+---
+import Base from "../layouts/Base.astro";
+import AdSlot from "../components/AdSlot.astro";
+import Field from "../components/Field.astro";
+import ResultPanel from "../components/ResultPanel.astro";
+import Faq from "../components/Faq.astro";
+import RelatedTools from "../components/RelatedTools.astro";
+import { toolJsonLd } from "../lib/seo";
+
+const PATH = "/freight-factoring-calculator/";
+const faqs = [
+  { q: "What is freight factoring?", a: "Freight factoring is when you sell an unpaid invoice to a factoring company in exchange for an immediate cash advance. The factor collects from the shipper or broker directly and sends you the remainder, minus its fee, once they pay." },
+  { q: "What is a typical freight factoring rate?", a: "Factoring fees for trucking typically range from 1% to 5% of the invoice face value per transaction, though some companies charge more for non-recourse arrangements or risky debtors. The rate alone does not tell you the true annual cost — that depends on how quickly your customers pay." },
+  { q: "What is recourse versus non-recourse factoring?", a: "With recourse factoring, if the debtor does not pay, you must buy the invoice back. With non-recourse factoring, the factor absorbs the bad debt — but charges a higher fee for that protection. The calculator works for either structure; just enter the fee you are quoted." },
+  { q: "What does advance rate mean?", a: "The advance rate is the percentage of the invoice the factor pays you immediately. A 95% advance on a $5,000 invoice means you receive $4,750 today. The remaining 5% ($250) is held as a reserve and returned to you, minus the fee, once the debtor pays." },
+  { q: "How does the annualised rate compare to a business loan?", a: "Factoring fees look small (3% feels modest), but because invoices turn over in 30–60 days the annualised cost is often 20–40%. A business line of credit at 10% APR is usually cheaper — but only if you can qualify and draw it fast enough. Use this calculator to see the real annual cost before deciding." },
+];
+---
+<Base
+  title="Freight Factoring Calculator — True Cost and Annualised Rate"
+  description="Free freight factoring calculator for owner-operators. Enter your invoice amount, advance rate and factoring fee to see the true annual cost and compare it with a line of credit."
+  jsonLd={toolJsonLd({ name: "Freight Factoring Calculator", path: PATH, faqs })}
+>
+  <h1>Freight factoring calculator</h1>
+  <p>Enter your invoice details and the factor's quote to see your advance, reserve release and the annualised cost of factoring versus waiting for payment.</p>
+
+  <form id="ff" class="card" novalidate>
+    <Field label="Invoice amount (USD)" name="invoiceAmount" inputmode="decimal" min="1" step="any" value="5000" />
+    <Field label="Advance rate (%)" name="advanceRatePct" inputmode="decimal" min="50" max="100" step="any" value="95" />
+    <Field label="Factoring fee (%)" name="factoringFeePct" inputmode="decimal" min="0.01" max="20" step="any" value="3" />
+    <Field label="Days until debtor pays" name="daysToPayment" inputmode="numeric" min="1" max="180" step="1" value="45" />
+    <p class="hint">Enter the net payment terms on the invoice — for example, 30 for net-30 or 45 for net-45.</p>
+    <p id="err" class="error" hidden></p>
+  </form>
+
+  <ResultPanel minHeight="18rem" toolId="freight-factoring">
+    <dl id="res"></dl>
+  </ResultPanel>
+
+  <AdSlot page="factoring" />
+
+  <section>
+    <h2>How freight factoring works</h2>
+    <ol>
+      <li><strong>You deliver the load</strong> and invoice the broker or shipper for the full amount.</li>
+      <li><strong>You sell the invoice</strong> to the factoring company. It verifies the load was delivered and advances you a percentage of the face value — usually 80–97% — the same day or next business day.</li>
+      <li><strong>The debtor pays the factor</strong> directly on the invoice's net terms (30, 45 or 60 days).</li>
+      <li><strong>The factor releases the reserve</strong> to you: the held-back percentage minus the factoring fee.</li>
+    </ol>
+
+    <h2>How the calculator works</h2>
+    <ul>
+      <li><strong>Advance</strong> = invoice × advance rate. This is the cash you receive today.</li>
+      <li><strong>Fee</strong> = invoice × factoring fee %. This is the total cost of factoring.</li>
+      <li><strong>Reserve release</strong> = (invoice × (1 − advance rate)) − fee. If the fee is larger than the reserve, the reserve release is zero; the factor simply keeps the reserve and some of the advance covers the remainder.</li>
+      <li><strong>Net received</strong> = invoice − fee. The total you receive across both disbursements.</li>
+      <li><strong>Annualised cost</strong> = (fee ÷ advance) × (365 ÷ days to payment). This converts the flat fee into a rate comparable to a bank loan or line of credit.</li>
+    </ul>
+
+    <h2>Worked example</h2>
+    <p>You invoice a broker $5,000 on net-45 terms. A factoring company offers a 95% advance at a 3% fee.</p>
+    <ul>
+      <li>Advance today: $5,000 × 0.95 = <strong>$4,750</strong></li>
+      <li>Fee: $5,000 × 0.03 = <strong>$150</strong></li>
+      <li>Reserve held back: $5,000 × 0.05 = $250</li>
+      <li>Reserve released when broker pays: $250 − $150 = <strong>$100</strong></li>
+      <li>Net received total: $4,750 + $100 = <strong>$4,850</strong> (or $5,000 − $150)</li>
+      <li>Annualised cost: ($150 ÷ $4,750) × (365 ÷ 45) = 3.16% × 8.11 ≈ <strong>25.6%</strong></li>
+    </ul>
+    <p>A 3% flat fee feels modest, but at 45-day terms it equates to a 25.6% annualised rate — more than twice a typical business line of credit. On 30-day terms the same 3% fee annualises to 38.4%.</p>
+
+    <h2>Factoring versus a line of credit</h2>
+    <p>Factoring has two advantages: it approves based on your customers' credit, not yours, and it scales automatically with your invoice volume. A line of credit is usually cheaper in annual-rate terms but requires a credit check, takes longer to set up, and may have draw limits.</p>
+    <p>If you already use factoring in your load pricing, the <a href="/load-profit-calculator/">load profit calculator</a> has a factoring fee field — enter the fee percentage there to see its impact on your profit per mile before you accept the load.</p>
+
+    <h2>What this calculator does not cover</h2>
+    <ul>
+      <li><strong>Additional fees.</strong> Some factors charge ACH or wire fees, monthly minimums, or fuel-advance fees on top of the stated factoring rate. Add those to the fee field for a complete comparison.</li>
+      <li><strong>Non-payment risk.</strong> With recourse factoring, if the debtor does not pay you must repurchase the invoice. That risk is not modelled here.</li>
+      <li><strong>Fuel advances.</strong> Many factors offer a same-day fuel advance against pending loads. Treat the advance fee as a separate transaction and run it through the calculator on its own.</li>
+    </ul>
+    <p>Results are estimates based on what you enter, not financial advice. Terms vary by factor and by debtor quality.</p>
+
+    <Faq faqs={faqs} />
+    <RelatedTools current={PATH} />
+  </section>
+
+  <script>
+    import { calculateFreightFactoring } from "@haulnumbers/core";
+    import { bindForm, clearInvalid, hideErrors, markInvalid, num, renderRows, showErrors, usd } from "../lib/toolUi";
+
+    const form = document.getElementById("ff") as HTMLFormElement;
+    const res = document.getElementById("res") as HTMLElement;
+    const err = document.getElementById("err") as HTMLElement;
+
+    const pct = (n: number) => `${(n * 100).toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 2 })}%`;
+
+    function run() {
+      const fd = new FormData(form);
+      const r = calculateFreightFactoring({
+        invoiceAmount: num(fd, "invoiceAmount"),
+        advanceRatePct: num(fd, "advanceRatePct"),
+        factoringFeePct: num(fd, "factoringFeePct"),
+        daysToPayment: Math.round(num(fd, "daysToPayment")),
+      });
+
+      clearInvalid(form);
+      res.replaceChildren();
+
+      if (!r.ok) {
+        showErrors(err, r.errors.map((e) => {
+          markInvalid(form, e.field);
+          return e.message;
+        }));
+        return;
+      }
+
+      hideErrors(err);
+      const v = r.value;
+      renderRows(res, [
+        ["Advance received today", usd(v.advanceAmount), true],
+        ["Factoring fee", usd(v.feeAmount)],
+        ["Reserve released when debtor pays", usd(v.reserveRelease)],
+        ["Net received total", usd(v.netReceived), true],
+        ["Annualised cost of factoring", pct(v.effectiveAnnualRate), true],
+        ["Daily cost", usd(v.dailyCost) + "/day"],
+      ]);
+    }
+    bindForm(form, run);
+  </script>
+</Base>

@@ -31,7 +31,7 @@ const state = existsSync(statePath) ? JSON.parse(readFileSync(statePath, "utf8")
 const used = new Set(state.usedUrls);
 
 async function fetchText(url) {
-  const res = await fetch(url, { headers: { "User-Agent": "HaulNumbersDigest/1.0 (+https://haulnumbers.com)" }, signal: AbortSignal.timeout(20000), redirect: "follow" });
+  const res = await fetch(url, { headers: { "User-Agent": "TruckerNumbersDigest/1.0 (+https://truckernumbers.com)" }, signal: AbortSignal.timeout(20000), redirect: "follow" });
   if (!res.ok) throw new Error(`${res.status} ${url}`);
   return res.text();
 }

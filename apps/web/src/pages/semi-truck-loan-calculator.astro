@@ -1,0 +1,155 @@
+---
+import Base from "../layouts/Base.astro";
+import AdSlot from "../components/AdSlot.astro";
+import Field from "../components/Field.astro";
+import ResultPanel from "../components/ResultPanel.astro";
+import Faq from "../components/Faq.astro";
+import RelatedTools from "../components/RelatedTools.astro";
+import { toolJsonLd } from "../lib/seo";
+
+const PATH = "/semi-truck-loan-calculator/";
+const faqs = [
+  { q: "What is a typical semi-truck loan rate?", a: "New commercial truck loans typically range from 5% to 12% APR depending on your credit score, the lender and the truck's age. Rates for used trucks or owner-operators with shorter credit histories are often in the 8–15% range. SBA 7(a) equipment loans can come in under 10% when you qualify." },
+  { q: "How long can you finance a semi truck?", a: "Most lenders offer terms of 36 to 72 months for new trucks and 24 to 60 months for used. Longer terms lower your monthly payment but increase the total interest paid. Lenders also watch loan-to-value: expect to put 10–25% down." },
+  { q: "Is it better to lease or buy a semi truck?", a: "Buying builds equity and may be cheaper over the long run if you keep the truck beyond the loan payoff. Leasing keeps monthly payments lower and lets you upgrade trucks more often, but you never own the asset and have less flexibility on mileage and modifications. Use this calculator to find the total cost of buying, then compare with lease quotes." },
+  { q: "How does a trade-in lower my loan?", a: "The lender deducts your trade-in value from the purchase price before calculating the loan amount. A $10,000 trade-in on a $120,000 truck with a $20,000 cash down payment leaves a $90,000 loan instead of $100,000 — saving roughly $200 in total interest at 7% over 60 months." },
+  { q: "What credit score do I need for a truck loan?", a: "Many commercial lenders want a score of 600 or above, with the best rates typically going to scores above 700. Owner-operators with less than two years of business history may face higher rates or require a co-signer regardless of credit score." },
+];
+---
+<Base
+  title="Semi-Truck Loan Calculator — Monthly Payment and Payoff Schedule"
+  description="Free semi-truck loan calculator. Enter the truck price, down payment and APR to see your monthly payment, total interest and year-by-year amortization schedule."
+  jsonLd={toolJsonLd({ name: "Semi-Truck Loan Calculator", path: PATH, faqs })}
+>
+  <h1>Semi-truck loan calculator</h1>
+  <p>Enter the purchase price, your down payment and the lender's rate to see your monthly payment and exactly how much of each year goes to principal versus interest.</p>
+
+  <form id="stl" class="card" novalidate>
+    <Field label="Truck price (USD)" name="truckPrice" inputmode="decimal" min="1" step="any" value="120000" />
+    <Field label="Down payment (USD)" name="downPayment" inputmode="decimal" min="0" step="any" value="20000" />
+    <Field label="Trade-in value (USD)" name="tradeInValue" inputmode="decimal" min="0" step="any" value="0" />
+    <Field label="Annual interest rate (APR %)" name="annualRatePct" inputmode="decimal" min="0" max="30" step="any" value="7" />
+    <Field label="Loan term (months)" name="termMonths" inputmode="numeric" min="12" max="84" step="1" value="60" />
+    <p class="hint">Common terms: 36, 48, 60, or 72 months. Enter 0 in the trade-in field if none.</p>
+    <p id="err" class="error" hidden></p>
+  </form>
+
+  <ResultPanel minHeight="18rem" toolId="semi-truck-loan">
+    <dl id="res"></dl>
+  </ResultPanel>
+
+  <div id="schedule-wrap" hidden>
+    <h2>Year-by-year amortization</h2>
+    <div class="tablewrap" tabindex="0" role="region" aria-label="Year-by-year amortization, scrolls sideways on small screens">
+      <table id="schedule">
+        <thead>
+          <tr>
+            <th scope="col">Year</th>
+            <th scope="col">Principal paid</th>
+            <th scope="col">Interest paid</th>
+            <th scope="col">Ending balance</th>
+          </tr>
+        </thead>
+        <tbody id="schedule-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <AdSlot page="truck-loan" />
+
+  <section>
+    <h2>How the calculator works</h2>
+    <ul>
+      <li><strong>Loan amount</strong> = truck price − down payment − trade-in value.</li>
+      <li><strong>Monthly payment</strong> is calculated using the standard amortization formula: P × [r(1+r)ⁿ] ÷ [(1+r)ⁿ − 1], where P is the loan amount, r is the monthly rate (APR ÷ 12), and n is the number of months. At 0% APR the payment is simply P ÷ n.</li>
+      <li><strong>Total interest</strong> = (monthly payment × n) − loan amount, accounting for any rounding on the final payment.</li>
+      <li>The <strong>amortization table</strong> shows principal and interest for each calendar year of the loan. The first year covers months 1–12, the second covers 13–24, and so on. A partial final year (e.g. a 50-month loan) is shown in its own row.</li>
+    </ul>
+
+    <h2>Worked example</h2>
+    <p>You buy a used semi for $120,000. You put $20,000 down with no trade-in, leaving a $100,000 loan at 7% APR for 60 months.</p>
+    <ul>
+      <li>Monthly rate: 7% ÷ 12 = 0.5833%</li>
+      <li>Monthly payment: $100,000 × [0.005833 × 1.005833⁶⁰] ÷ [1.005833⁶⁰ − 1] ≈ <strong>$1,980</strong></li>
+      <li>Total paid over 5 years: $1,980 × 60 = $118,800</li>
+      <li>Total interest: $118,800 − $100,000 = <strong>$18,800</strong></li>
+    </ul>
+    <p>Cutting the term to 36 months raises the payment to about $3,088 but saves roughly $9,500 in interest. Extending to 72 months drops the payment to about $1,704 but adds $2,700 in interest versus the 60-month option.</p>
+
+    <h2>What this calculator does not cover</h2>
+    <ul>
+      <li><strong>Taxes, title and dealer fees.</strong> Add these to the truck price if your lender rolls them into the loan.</li>
+      <li><strong>Insurance and maintenance.</strong> Commercial truck insurance typically runs $8,000–$16,000 per year and is not included in loan payments.</li>
+      <li><strong>Balloon payments.</strong> Some commercial loans end with a large lump-sum payment. This calculator assumes a fully amortizing loan with no balloon.</li>
+      <li><strong>Variable rates.</strong> This assumes a fixed APR for the full term.</li>
+    </ul>
+    <p>Results are estimates based on what you enter, not a loan quote or financial advice. Ask your lender for the full loan document before signing.</p>
+
+    <Faq faqs={faqs} />
+    <RelatedTools current={PATH} />
+  </section>
+
+  <script>
+    import { calculateSemiTruckLoan } from "@haulnumbers/core";
+    import { bindForm, clearInvalid, hideErrors, markInvalid, num, renderRows, showErrors, usd } from "../lib/toolUi";
+
+    const form = document.getElementById("stl") as HTMLFormElement;
+    const res = document.getElementById("res") as HTMLElement;
+    const err = document.getElementById("err") as HTMLElement;
+    const scheduleWrap = document.getElementById("schedule-wrap") as HTMLElement;
+    const scheduleBody = document.getElementById("schedule-body") as HTMLElement;
+
+    function run() {
+      const fd = new FormData(form);
+      const r = calculateSemiTruckLoan({
+        truckPrice: num(fd, "truckPrice"),
+        downPayment: num(fd, "downPayment"),
+        tradeInValue: num(fd, "tradeInValue"),
+        annualRatePct: num(fd, "annualRatePct"),
+        termMonths: Math.round(num(fd, "termMonths")),
+      });
+
+      clearInvalid(form);
+      res.replaceChildren();
+      scheduleWrap.hidden = true;
+
+      if (!r.ok) {
+        showErrors(err, r.errors.map((e) => {
+          markInvalid(form, e.field);
+          return e.message;
+        }));
+        return;
+      }
+
+      hideErrors(err);
+      const v = r.value;
+      renderRows(res, [
+        ["Monthly payment", usd(v.monthlyPayment), true],
+        ["Loan amount", usd(v.loanAmount)],
+        ["Total interest", usd(v.totalInterest)],
+        ["Total cost of loan", usd(v.totalCost), true],
+      ]);
+
+      // Populate amortization table
+      scheduleBody.replaceChildren();
+      for (const row of v.annualSchedule) {
+        const tr = document.createElement("tr");
+        const cells = [
+          `Year ${row.year}`,
+          usd(row.principalPaid),
+          usd(row.interestPaid),
+          usd(row.endingBalance),
+        ];
+        for (const text of cells) {
+          const td = document.createElement("td");
+          td.textContent = text;
+          tr.append(td);
+        }
+        scheduleBody.append(tr);
+      }
+      scheduleWrap.hidden = false;
+    }
+
+    bindForm(form, run);
+  </script>
+</Base>

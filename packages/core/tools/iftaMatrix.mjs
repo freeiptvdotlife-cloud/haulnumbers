@@ -38,6 +38,7 @@ export function matrixUrl(quarter) {
 
 const ORDINAL = { 1: "1st", 2: "2nd", 3: "3rd", 4: "4th" };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function parseRate(text, where) {
   if (!/^\d+\.\d{4}$/.test(text)) throw new Error(`${where}: unparseable rate "${text}"`);
   return Number(text);

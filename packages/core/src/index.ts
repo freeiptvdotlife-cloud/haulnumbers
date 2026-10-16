@@ -7,3 +7,5 @@ export * from "./data/iftaRates";
 export * from "./ifta";
 export * from "./data/perDiemRates";
 export * from "./perDiem";
+export * from "./freightFactoring";
+export * from "./semiTruckLoan";
