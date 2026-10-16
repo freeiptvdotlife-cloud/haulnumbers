@@ -1,7 +1,7 @@
-# Haul Numbers
+# Trucker Numbers
 
 Free, accurate calculators for owner-operator truckers, on the web (AdSense) and Android (AdMob).
-Domain (planned): `haulnumbers.com` · Android package (planned): `com.haulnumbers.app`
+Domain: `truckernumbers.com` · Android package (planned): `com.haulnumbers.app`
 
 ## Repo layout
 ```

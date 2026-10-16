@@ -1,9 +1,9 @@
 /** The public address of this build. Staging builds set PUBLIC_SITE_URL; production uses the real domain. */
-export const SITE_URL: string = (import.meta.env.PUBLIC_SITE_URL || "https://haulnumbers.com").replace(/\/+$/, "");
+export const SITE_URL: string = (import.meta.env.PUBLIC_SITE_URL || "https://truckernumbers.com").replace(/\/+$/, "");
 
-export const SITE_NAME = "Haul Numbers";
+export const SITE_NAME = "Trucker Numbers";
 
-/** The publisher of record across the sahamo portfolio (haulnumbers.com, funding-numbers.com, etc). */
+/** The publisher of record across the sahamo portfolio (truckernumbers.com, mainstreetnumbers.com, etc). */
 export const PUBLISHER_BRAND = "sahamo";
 
 /**

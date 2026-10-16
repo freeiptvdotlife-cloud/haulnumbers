@@ -26,7 +26,7 @@ Each phase has **deliverables** and **exit criteria**. Do not start monetization
 ## Phase 2 · Launch and AdSense approval
 | # | Task | Size |
 |---|---|---|
-| 2.1 | Buy domain (`haulnumbers.com`, verify availability first), enable auto-renew, WHOIS privacy | S |
+| 2.1 | Buy domain (`truckernumbers.com`, verify availability first), enable auto-renew, WHOIS privacy | S |
 | 2.2 | Cloudflare Pages project, custom domain, HTTPS, www→apex redirect, security headers | S |
 | 2.3 | Search Console (domain property), submit sitemap, IndexNow ping on deploy | S |
 | 2.4 | Privacy, About, Contact and Terms pages ✅ built (privacy policy meets the checklist in doc 05); **needs a real contact email**, which requires the domain | S |
