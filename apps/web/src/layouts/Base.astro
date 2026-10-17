@@ -69,6 +69,13 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
           <span class="i-moon"><Icon name="moon" size={20} /></span>
           <span class="sr-only" data-toggle-label>Switch to light theme</span>
         </button>
+        <button type="button" class="nav-ham" id="nav-ham" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+        {TOOLS.map((t) => (<a href={t.path} aria-current={here === t.path ? "page" : undefined}><Icon name={t.icon} size={16} />{t.navLabel}</a>))}
+        <a href="/guides/" aria-current={here.startsWith("/guides/") ? "page" : undefined}><Icon name="book" size={16} />Guides</a>
       </div>
     </header>
     <div class="print-header" aria-hidden="true"><strong>Trucker Numbers</strong> · truckernumbers.com &nbsp;|&nbsp; <span class="print-date"></span></div>
@@ -109,4 +116,23 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     }
     sync();
   });
+
+  // Mobile hamburger
+  const ham = document.getElementById("nav-ham");
+  const mobileNav = document.getElementById("mobile-nav");
+  if (ham && mobileNav) {
+    ham.addEventListener("click", () => {
+      const open = ham.getAttribute("aria-expanded") === "true";
+      ham.setAttribute("aria-expanded", String(!open));
+      ham.setAttribute("aria-label", !open ? "Close menu" : "Open menu");
+      mobileNav.setAttribute("aria-hidden", String(open));
+    });
+    document.addEventListener("click", (e) => {
+      if (!ham.contains(e.target as Node) && !mobileNav.contains(e.target as Node)) {
+        ham.setAttribute("aria-expanded", "false");
+        ham.setAttribute("aria-label", "Open menu");
+        mobileNav.setAttribute("aria-hidden", "true");
+      }
+    });
+  }
 </script>
