@@ -1,0 +1,26 @@
+---
+// Google Consent Mode v2 default signals. Must load before AdSense/Funding Choices
+// (ConsentManager.astro) and before any other tag, so ads never start in a granted
+// state by accident. This alone doesn't show anything to the visitor — it just tells
+// Google's tags to behave as "denied" until ConsentManager records a real choice.
+// https://developers.google.com/tag-platform/security/guides/consent
+---
+
+<script is:inline>
+  (function () {
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    window.gtag = window.gtag || gtag;
+    gtag('consent', 'default', {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+      // Give a real CMP (Funding Choices) half a second to report a stored choice
+      // before any queued tag fires with the denied default.
+      wait_for_update: 500,
+    });
+  })();
+</script>

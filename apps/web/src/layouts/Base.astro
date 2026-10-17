@@ -1,6 +1,9 @@
 ---
 import "../styles/theme.css";
 import "../styles/tool.css";
+import ConsentManager from "../components/ConsentManager.astro";
+import ConsentMode from "../components/ConsentMode.astro";
+import GA4 from "../components/GA4.astro";
 import Icon from "../components/Icon.astro";
 import { TOOLS } from "../data/tools";
 import { SITE_NAME } from "../data/site";
@@ -26,6 +29,8 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <ConsentMode />
+    <GA4 />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -85,6 +90,7 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
       <p>© {new Date().getFullYear()} Trucker Numbers. Estimates only, not financial, tax or legal advice.</p>
       <nav aria-label="Footer"><a href="/calculators/">All calculators</a> · <a href="/guides/">Guides</a> · <a href="/about/">About</a> · <a href="/contact/">Contact</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a></nav>
     </footer>
+    <ConsentManager />
   </body>
 </html>
 <script>

@@ -1,0 +1,165 @@
+---
+// Two paths, chosen at build time by whether PUBLIC_ADSENSE_CLIENT is set:
+//
+// 1. Configured (production, once AdSense is approved and a "Privacy & messaging"
+//    message is published for the account): loads Google's own Funding Choices script,
+//    a Google-certified CMP. It geo-targets EEA/UK/Switzerland vs. everywhere else,
+//    shows the right consent UI for each, updates the Consent Mode v2 signals set by
+//    ConsentMode.astro, and exposes a revocation tool for the footer's privacy-choices
+//    link. This satisfies docs/09 §9.1's "Google-certified CMP for EEA/UK".
+//
+// 2. Not configured (local dev, or before the AdSense account exists): a minimal
+//    first-party banner. It can't geo-target, so it treats every visitor the same and
+//    keeps Consent Mode's "denied" default until the visitor makes a choice. It exists
+//    so the codebase is never non-compliant, not so it ships instead of step 1.
+---
+
+<script
+  is:inline
+  define:vars={{
+    client:
+      import.meta.env.PUBLIC_TARGET === 'android'
+        ? undefined
+        : import.meta.env.PUBLIC_ADSENSE_CLIENT,
+  }}
+>
+  (function () {
+    var STORAGE_KEY = 'fn_consent_v1';
+    var GRANTED = {
+      ad_storage: 'granted',
+      ad_user_data: 'granted',
+      ad_personalization: 'granted',
+      analytics_storage: 'granted',
+    };
+    var DENIED = {
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+    };
+
+    function update(state) {
+      window.gtag('consent', 'update', state);
+    }
+    function save(choice) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ choice: choice, at: Date.now() }));
+      } catch (e) {
+        /* private browsing or storage disabled: the choice just won't persist across visits */
+      }
+    }
+    function readSaved() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // --- Path 1: Google's certified CMP ---
+    if (client) {
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://fundingchoicesmessages.google.com/i/' + client + '?ers=1';
+      document.head.appendChild(s);
+      // Google's documented "presence" signal, so its own tags can detect the CMP loaded.
+      (function signalGooglefcPresent() {
+        if (!window.frames['googlefcPresent']) {
+          if (document.body) {
+            var iframe = document.createElement('iframe');
+            iframe.style.cssText = 'display:none;width:0;height:0;border:none;';
+            iframe.name = 'googlefcPresent';
+            document.body.appendChild(iframe);
+          } else {
+            setTimeout(signalGooglefcPresent, 0);
+          }
+        }
+      })();
+      window.__reopenConsent = function () {
+        if (window.googlefc && window.googlefc.showRevocationMessage) {
+          window.googlefc.showRevocationMessage();
+        }
+      };
+      // Funding Choices manages Consent Mode updates itself once its message resolves;
+      // our fallback banner below only runs when this script never initializes.
+    }
+
+    // --- Path 2: fallback banner ---
+    function showFallbackBanner() {
+      var el = document.getElementById('consent-banner');
+      if (!el) return;
+      el.hidden = false;
+      el.querySelector('[data-consent="accept"]').addEventListener('click', function () {
+        update(GRANTED);
+        save('accepted');
+        el.hidden = true;
+      });
+      el.querySelector('[data-consent="reject"]').addEventListener('click', function () {
+        update(DENIED);
+        save('rejected');
+        el.hidden = true;
+      });
+      window.__reopenConsent = function () {
+        el.hidden = false;
+      };
+    }
+
+    function initFallback() {
+      // Global Privacy Control: treat it as an explicit opt-out signal (denied is
+      // already the default, so this mainly records the choice and skips the banner).
+      if (navigator.globalPrivacyControl === true && !readSaved()) {
+        save('gpc');
+        return;
+      }
+      var saved = readSaved();
+      if (saved) {
+        update(saved.choice === 'accepted' ? GRANTED : DENIED);
+        return;
+      }
+      showFallbackBanner();
+    }
+
+    if (!client) {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFallback);
+      } else {
+        // The banner <div> is below this <script> tag in the HTML, so it hasn't
+        // been parsed into the DOM yet even though readyState is not 'loading'.
+        // Defer one microtask so the parser finishes the element first.
+        setTimeout(initFallback, 0);
+      }
+    } else {
+      // Give the real CMP a moment to report; if window.googlefc never shows up,
+      // something's misconfigured (e.g. no message published yet) and we fall back
+      // rather than silently leaving the visitor with no way to consent.
+      setTimeout(function () {
+        if (!window.googlefc) initFallback();
+      }, 2000);
+    }
+  })();
+</script>
+
+<div
+  id="consent-banner"
+  class="consent-banner"
+  hidden
+  role="dialog"
+  aria-live="polite"
+  aria-label="Cookie and privacy choices"
+>
+  <p>
+    We use cookies for advertising. See our <a href="/privacy/">privacy policy</a>. This banner is a
+    placeholder shown only because no consent tool is configured yet (
+    <code>PUBLIC_ADSENSE_CLIENT</code>
+    is unset) — see docs/09 §9.1.
+  </p>
+  <div class="consent-banner__actions">
+    <button type="button" class="btn" data-consent="reject">
+      Reject non-essential
+    </button>
+    <button type="button" class="btn btn--primary" data-consent="accept">
+      Accept
+    </button>
+  </div>
+</div>
